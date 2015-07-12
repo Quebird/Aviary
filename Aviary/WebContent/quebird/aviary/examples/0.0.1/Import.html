@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../lib/0.0.1/quebird_aviary.js"></script>
+<title>Aviary - Import</title>
+<script type="text/javascript">
+	function introspectAviary()
+	{
+		document.getElementById("p1").textContent = "Aviary library version: " + aviary.getVersion();
+	}
+</script>
+<script type="text/javascript">
+	window.onload = function(e) 
+	{ 
+		aviary = new Aviary();
+		introspectAviary();
+		var elementCanvas = aviary.canvasCreate('canvas1');
+		aviary.canvasDrawNow();
+	}
+</script>
+</head>
+<body>
+
+<p id="p1"></p>
+
+</body>
+</html>
