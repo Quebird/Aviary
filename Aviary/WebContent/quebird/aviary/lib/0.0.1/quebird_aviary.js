@@ -5,6 +5,7 @@
 function Aviary()
 {
 	this.version = "0.0.1";
+	this.id = undefined;
 	this.models = [];
 	this.views = [];
 	this.controllers = [];
@@ -16,6 +17,15 @@ function Aviary()
 }
 
 Aviary.prototype.constructor = Aviary;
+
+Aviary.prototype.getID = function()
+{
+	return this.id;
+}
+Aviary.prototype.setID = function(id)
+{
+	this.id = id;
+}
 
 Aviary.prototype.getVersion = function()
 {
@@ -109,35 +119,19 @@ function AviaryView()
 		x : 0,
 		y : 0
 	};
+	this.size =
+	{
+		w : 0,
+		h : 0
+	}
 	this.canvas = 
 	{
 		documentElement : undefined,
-		documentElementLazy : false,
 		backgroundColor : undefined
 	};
 }
 
 AviaryView.prototype.constructor = AviaryView;
-
-AviaryView.prototype.create = function(id)
-{
-	var element = document.getElementById(id);
-	
-	if(!element)
-	{
-		element = document.createElement('canvas');
-		element.id = id;
-	    document.getElementsByTagName('body') [0].appendChild(element);
-		this.canvas.documentElementLazy = true;
-	}
-    this.canvas.documentElement = element;
-
-    this.setID(id);
-    this.setWidth(0);
-    this.setHeight(0);
-    
-    return this.canvas.documentElement;
-}
 
 AviaryView.prototype.getAviary = function()
 {
@@ -157,6 +151,28 @@ AviaryView.prototype.setID = function(id)
 	this.id = id;
 }
 
+AviaryView.prototype.getCanvasDocumentElement = function()
+{
+	return this.canvas.documentElement;
+}
+
+AviaryView.prototype.attachCanvasDocumentElement = function(canvasDocumentElement)
+{
+	this.canvas.documentElement = canvasDocumentElement;
+	this.updateDocumentElement();
+}
+
+AviaryView.prototype.updateDocumentElement = function()
+{
+	var canvasDocumentElement = this.getCanvasDocumentElement();
+	if(canvasDocumentElement)
+	{
+		canvasDocumentElement.width = this.getWidth();
+		canvasDocumentElement.height = this.getHeight();
+	}
+	
+}
+
 AviaryView.prototype.getPosition = function()
 {
 	return this.position;
@@ -167,14 +183,62 @@ AviaryView.prototype.setPosition = function(position)
 	this.position = position;
 }
 
+AviaryView.prototype.getX = function()
+{
+	return this.position.x;
+}
+
+AviaryView.prototype.setX = function(x)
+{
+	this.position.x = x;
+}
+
+AviaryView.prototype.getY = function()
+{
+	return this.position.y;
+}
+
+AviaryView.prototype.setY = function(y)
+{
+	this.position.y = y;
+}
+
+AviaryView.prototype.setSize = function(size)
+{
+	this.size = size;
+	this.updateDocumentElement();
+}
+
+AviaryView.prototype.getSize = function()
+{
+	return this.size;
+}
+
+AviaryView.prototype.getWidth = function()
+{
+	return this.size.w;
+}
+
 AviaryView.prototype.setWidth = function(width)
 {
-	this.canvas.documentElement.width = width;
+	this.size.w = width;
+	this.updateDocumentElement();
+}
+
+AviaryView.prototype.getHeight = function()
+{
+	return this.size.h;
 }
 
 AviaryView.prototype.setHeight = function(height)
 {
-	this.canvas.documentElement.height = height;
+	this.size.h = height;
+	this.updateDocumentElement();
+}
+
+AviaryView.prototype.getBackgroundColor = function()
+{
+	return this.canvas.backgroundColor;
 }
 
 AviaryView.prototype.setBackgroundColor = function(backgroundColor)
@@ -185,9 +249,9 @@ AviaryView.prototype.setBackgroundColor = function(backgroundColor)
 AviaryView.prototype.isPointWithin = function(position)
 {
 	var result = false;
-	if(this.position.x <= position.x && position.x < this.position.x + this.canvas.documentElement.width)
+	if(this.position.x <= position.x && position.x < this.position.x + this.getWidth())
 	{
-		if(this.position.y <= position.y && position.y < this.position.y + this.canvas.documentElement.height)
+		if(this.position.y <= position.y && position.y < this.position.y + this.getHeight())
 		{
 			result = true;
 		}
@@ -197,11 +261,13 @@ AviaryView.prototype.isPointWithin = function(position)
 
 AviaryView.prototype.draw = function()
 {
-	var ctx = this.canvas.documentElement.getContext("2d");
-	if(this.canvas.backgroundColor)
+	var canvasDocumentElement = this.getCanvasDocumentElement();
+	var ctx = canvasDocumentElement.getContext("2d");
+	var backgroundColor = this.getBackgroundColor();
+	if(backgroundColor)
 	{
-		ctx.fillStyle = this.canvas.backgroundColor;
-		ctx.fillRect(0, 0, this.canvas.documentElement.width, this.canvas.documentElement.height);	
+		ctx.fillStyle = backgroundColor;
+		ctx.fillRect(0, 0, this.getWidth(), this.getHeight());	
 	}
 	var aviary = this.getAviary();
 	if(aviary)
@@ -217,6 +283,15 @@ AviaryView.prototype.draw = function()
 }
 
 
+// AviaryView - public static methods
+AviaryView.createDocumentElement = function(id)
+{
+	var element = document.createElement('canvas');
+	element.id = id;
+    document.getElementsByTagName('body') [0].appendChild(element);
+	return element;
+}
+
 
 /**
  * Point - Model Object (that also can draw itself)
@@ -231,15 +306,15 @@ function AviaryPixel()
 		x : undefined,
 		y : undefined
 	};
+	this.size =
+	{
+		w : 1,
+		h : 1
+	}
 	this.color = undefined;
 }
 
 AviaryPixel.prototype.constructor = AviaryPixel;
-
-AviaryPixel.prototype.create = function(id)
-{
-    this.setID(id);
-}
 
 AviaryPixel.prototype.getAviary = function()
 {
@@ -270,6 +345,61 @@ AviaryPixel.prototype.setPosition = function(position)
 	this.position = position;
 }
 
+AviaryPixel.prototype.getX = function()
+{
+	return this.position.x;
+}
+
+AviaryPixel.prototype.setX = function(x)
+{
+	this.position.x = x;
+}
+
+AviaryPixel.prototype.getY = function()
+{
+	return this.position.y;
+}
+
+AviaryPixel.prototype.setY = function(y)
+{
+	this.position.y = y;
+}
+
+AviaryPixel.prototype.setSize = function(size)
+{
+	this.size = size;
+}
+
+AviaryPixel.prototype.getSize = function()
+{
+	return this.size;
+}
+
+AviaryPixel.prototype.getWidth = function()
+{
+	return this.size.w;
+}
+
+AviaryPixel.prototype.setWidth = function(width)
+{
+	this.size.w = width;
+}
+
+AviaryPixel.prototype.getHeight = function()
+{
+	return this.size.h;
+}
+
+AviaryPixel.prototype.setHeight = function(height)
+{
+	this.size.h = height;
+}
+
+AviaryPixel.prototype.getColor = function()
+{
+	return this.color;
+}
+
 AviaryPixel.prototype.setColor = function(color)
 {
 	this.color = color;
@@ -277,13 +407,16 @@ AviaryPixel.prototype.setColor = function(color)
 
 AviaryPixel.prototype.draw = function(view, ctx)
 {
-	if(this.color)
+	var thisColor = this.getColor();
+	if(thisColor)
 	{
-		if(view.isPointWithin(this.position))
+		var thisPosition = this.getPosition();
+		var isWithin = view.isPointWithin(thisPosition);
+		if(isWithin)
 		{
 			var viewPosition = view.getPosition();
-			ctx.fillStyle = this.color;
-			ctx.fillRect(this.position.x-viewPosition.x, this.position.y-viewPosition.y, 1, 1);	
+			ctx.fillStyle = thisColor;
+			ctx.fillRect(thisPosition.x-viewPosition.x, thisPosition.y-viewPosition.y, this.getWidth(), this.getHeight());	
 		}
 	}
 }

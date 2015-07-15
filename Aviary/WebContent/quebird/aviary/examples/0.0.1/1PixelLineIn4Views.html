@@ -13,45 +13,49 @@
 		for(index = 0; index < 15; ++index)
 		{
 			aviaryPixel = new AviaryPixel();
-			aviaryPixel.create('pixel' + index);
+			aviaryPixel.setID('pixel' + index);
 			aviaryPixel.setPosition({x:(25+10*index), y:(25 + 10*index)});
 			aviaryPixel.setColor("#000000");
 			aviary1.modelsAdd(aviaryPixel);
 		}
 		{
 			var aviaryView1 = new AviaryView();
-			var documentElementCanvas1 = aviaryView1.create('canvas1');
+			aviaryView1.setID('canvas1');
 			aviaryView1.setPosition({x:0,y:0});
 			aviaryView1.setWidth(100);
 			aviaryView1.setHeight(200);
 			aviaryView1.setBackgroundColor("#FF0000");
+			aviaryView1.attachCanvasDocumentElement(document.getElementById(aviaryView1.getID()));
 			aviary1.viewsAdd(aviaryView1);
 		}
 		{
 			var aviaryView2 = new AviaryView();
-			var documentElementCanvas2 = aviaryView2.create('canvas2');
+			aviaryView2.setID('canvas2');
 			aviaryView2.setPosition({x:100,y:0});
 			aviaryView2.setWidth(100);
 			aviaryView2.setHeight(200);
 			aviaryView2.setBackgroundColor("#00FF00");
+			aviaryView2.attachCanvasDocumentElement(document.getElementById(aviaryView2.getID()));
 			aviary1.viewsAdd(aviaryView2);
 		}
 		{
 			var aviaryView3 = new AviaryView();
-			var documentElementCanvas3 = aviaryView3.create('canvas3');
+			aviaryView3.setID('canvas3');
 			aviaryView3.setPosition({x:0,y:0});
 			aviaryView3.setWidth(200);
 			aviaryView3.setHeight(100);
 			aviaryView3.setBackgroundColor("#FF0000");
+			aviaryView3.attachCanvasDocumentElement(document.getElementById(aviaryView3.getID()));
 			aviary1.viewsAdd(aviaryView3);
 		}
 		{
 			var aviaryView4 = new AviaryView();
-			var documentElementCanvas4 = aviaryView4.create('canvas4');
+			aviaryView4.setID('canvas4');
 			aviaryView4.setPosition({x:0,y:100});
 			aviaryView4.setWidth(200);
 			aviaryView4.setHeight(100);
 			aviaryView4.setBackgroundColor("#00FF00");
+			aviaryView4.attachCanvasDocumentElement(document.getElementById(aviaryView4.getID()));
 			aviary1.viewsAdd(aviaryView4);
 		}
 		aviary1.viewsDraw();
