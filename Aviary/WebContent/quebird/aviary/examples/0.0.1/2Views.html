@@ -3,36 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <script type="text/javascript" src="../../lib/0.0.1/quebird_aviary.js"></script>
-<title>Aviary - Pixels</title>
+<title>Aviary - 2 Views</title>
 <script type="text/javascript">
 	window.onload = function(e) 
 	{ 
 		var aviary1 = new Aviary();
-		var index;
-		var aviaryPixel;
-		for(index = 0; index < 10; ++index)
-		{
-			aviaryPixel = new AviaryPixel();
-			aviaryPixel.create('pixel' + index);
-			aviaryPixel.setPosition({x:(50+10*index), y:(0 + 10*index)});
-			aviaryPixel.setColor("#000000");
-			aviary1.modelsAdd(aviaryPixel);
-		}
 		{
 			var aviaryView1 = new AviaryView();
 			var documentElementCanvas1 = aviaryView1.create('canvas1');
-			aviaryView1.setPosition({x:0,y:0});
-			aviaryView1.setWidth(100);
-			aviaryView1.setHeight(200);
+			aviaryView1.setWidth(200);
+			aviaryView1.setHeight(100);
 			aviaryView1.setBackgroundColor("#FF0000");
 			aviary1.viewsAdd(aviaryView1);
 		}
 		{
 			var aviaryView2 = new AviaryView();
 			var documentElementCanvas2 = aviaryView2.create('canvas2');
-			aviaryView2.setPosition({x:100,y:0});
-			aviaryView2.setWidth(100);
-			aviaryView2.setHeight(200);
+			aviaryView2.setWidth(200);
+			aviaryView2.setHeight(100);
 			aviaryView2.setBackgroundColor("#00FF00");
 			aviary1.viewsAdd(aviaryView2);
 		}

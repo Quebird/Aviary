@@ -112,6 +112,7 @@ function AviaryView()
 	this.canvas = 
 	{
 		documentElement : undefined,
+		documentElementLazy : false,
 		backgroundColor : undefined
 	};
 }
@@ -120,11 +121,15 @@ AviaryView.prototype.constructor = AviaryView;
 
 AviaryView.prototype.create = function(id)
 {
-	var element = undefined;
+	var element = document.getElementById(id);
 	
-	element = document.createElement('canvas');
-	element.id = id;
-    document.getElementsByTagName('body') [0].appendChild(element);
+	if(!element)
+	{
+		element = document.createElement('canvas');
+		element.id = id;
+	    document.getElementsByTagName('body') [0].appendChild(element);
+		this.canvas.documentElementLazy = true;
+	}
     this.canvas.documentElement = element;
 
     this.setID(id);
