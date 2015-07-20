@@ -1,2 +1,2 @@
 # Quebird Volary
-Prototype javascript UI library 
+javascript 2D pixel engine 
