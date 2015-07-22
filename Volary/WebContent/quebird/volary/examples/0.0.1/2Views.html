@@ -13,7 +13,7 @@
 			volaryView1.setID('canvas1');
 			volaryView1.setWidth(200);
 			volaryView1.setHeight(100);
-			volaryView1.setBackgroundColor("#FF0000");
+			volaryView1.setBackgroundColor({r:255,g:0,b:0,a:255});
 			var canvasDocumentElement1 = VolaryView.createDocumentElement(volaryView1.getID());
 			volaryView1.attachCanvasDocumentElement(canvasDocumentElement1);
 			volary1.viewsAdd(volaryView1);
@@ -23,7 +23,7 @@
 			volaryView1.setID('canvas2');
 			volaryView2.setWidth(200);
 			volaryView2.setHeight(100);
-			volaryView2.setBackgroundColor("#00FF00");
+			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});
 			var canvasDocumentElement2 = VolaryView.createDocumentElement(volaryView2.getID());
 			volaryView2.attachCanvasDocumentElement(canvasDocumentElement2);
 			volary1.viewsAdd(volaryView2);

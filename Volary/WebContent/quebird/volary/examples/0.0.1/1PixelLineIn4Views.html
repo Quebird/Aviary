@@ -10,21 +10,13 @@
 		var volary1 = new Volary();
 		var index;
 		var volaryPixel;
-		for(index = 0; index < 15; ++index)
-		{
-			volaryPixel = new VolaryPixel();
-			volaryPixel.setID('pixel' + index);
-			volaryPixel.setPosition({x:(25+10*index), y:(25 + 10*index)});
-			volaryPixel.setColor("#000000");
-			volary1.modelsAdd(volaryPixel);
-		}
 		{
 			var volaryView1 = new VolaryView();
 			volaryView1.setID('canvas1');
 			volaryView1.setPosition({x:0,y:0});
 			volaryView1.setWidth(100);
 			volaryView1.setHeight(200);
-			volaryView1.setBackgroundColor("#FF0000");
+			volaryView1.setBackgroundColor({r:255,g:0,b:0,a:255});
 			volaryView1.attachCanvasDocumentElement(document.getElementById(volaryView1.getID()));
 			volary1.viewsAdd(volaryView1);
 		}
@@ -34,7 +26,7 @@
 			volaryView2.setPosition({x:100,y:0});
 			volaryView2.setWidth(100);
 			volaryView2.setHeight(200);
-			volaryView2.setBackgroundColor("#00FF00");
+			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});
 			volaryView2.attachCanvasDocumentElement(document.getElementById(volaryView2.getID()));
 			volary1.viewsAdd(volaryView2);
 		}
@@ -44,7 +36,7 @@
 			volaryView3.setPosition({x:0,y:0});
 			volaryView3.setWidth(200);
 			volaryView3.setHeight(100);
-			volaryView3.setBackgroundColor("#FF0000");
+			volaryView3.setBackgroundColor({r:255,g:0,b:0,a:255});
 			volaryView3.attachCanvasDocumentElement(document.getElementById(volaryView3.getID()));
 			volary1.viewsAdd(volaryView3);
 		}
@@ -54,9 +46,17 @@
 			volaryView4.setPosition({x:0,y:100});
 			volaryView4.setWidth(200);
 			volaryView4.setHeight(100);
-			volaryView4.setBackgroundColor("#00FF00");
+			volaryView4.setBackgroundColor({r:0,g:255,b:0,a:255});
 			volaryView4.attachCanvasDocumentElement(document.getElementById(volaryView4.getID()));
 			volary1.viewsAdd(volaryView4);
+		}
+		for(index = 0; index < 15; ++index)
+		{
+			volaryPixel = new VolaryPixel();
+			volaryPixel.setID('pixel' + index);
+			volaryPixel.setPosition({x:(25+10*index), y:(25 + 10*index)});
+			volaryPixel.setColor({r:0,g:0,b:0,a:255});
+			volary1.modelsAdd(volaryPixel);
 		}
 		volary1.viewsDraw();
 	}
