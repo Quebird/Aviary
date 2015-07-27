@@ -384,6 +384,7 @@ VolaryView.prototype.eraseModel = function(model)
         var x, y;
         var canvasImageModelIndex = -1;
         var canvasImageModelEntries;
+        var model2Draw;
 		
 		if(modelsChange2Apply == model.getModelsChange())
 		{
@@ -391,12 +392,16 @@ VolaryView.prototype.eraseModel = function(model)
 			if(this.isPointWithin(positionModel))
 			{
 				x = positionModel.x - positionView.x;
+				if(!x)
+				{
+					console.log("!x");
+				}
 				y = positionModel.y - positionView.y;
 				canvasImageModelEntries = canvasImageModels[x][y];
 				var canvasImageModelIndex = canvasImageModelEntries.indexOf(model);
 				if(0 <= canvasImageModelIndex)
 				{
-					canvasImageModels[x][y].splice(canvasImageModelIndex, canvasImageModelIndex+1);
+					canvasImageModels[x][y].splice(canvasImageModelIndex, 1);
 				}
 				
 				pixel = {r:0,g:0,b:0,a:0};
@@ -406,7 +411,8 @@ VolaryView.prototype.eraseModel = function(model)
 				}
 				for(canvasImageModelIndex = 0; canvasImageModelIndex < canvasImageModelEntries.length; ++canvasImageModelIndex)
 				{
-					pixel = model.drawPixel(this, positionModel, pixel, canvasImageModelEntries);
+					model2Draw = canvasImageModelEntries[canvasImageModelIndex];
+					pixel = model2Draw.drawPixel(this, positionModel, pixel, canvasImageModelEntries);
 				}
 				imageDataIndex = 4*(x + y * this.getWidth());
 				
@@ -414,6 +420,9 @@ VolaryView.prototype.eraseModel = function(model)
 				canvasImageData.data[imageDataIndex + 1] = pixel.g;
 				canvasImageData.data[imageDataIndex + 2] = pixel.b;
 				canvasImageData.data[imageDataIndex + 3] = pixel.a;
+				
+				//volary1.viewsDraw();
+
 			}
 		}
 	}
@@ -437,6 +446,7 @@ VolaryView.prototype.drawModel = function(model)
         var x, y;
         var canvasImageModelIndex = -1;
         var canvasImageModelEntries;
+        var model_;
 		
 		if(modelsChange2Apply == model.getModelsChange())
 		{
@@ -445,12 +455,29 @@ VolaryView.prototype.drawModel = function(model)
 			{
 				x = positionModel.x - positionView.x;
 				y = positionModel.y - positionView.y;
+				if(!x)
+				{
+					console.log("!x");
+				}
 				
 				canvasImageModelEntries = canvasImageModels[x][y];
 				var canvasImageModelIndex = canvasImageModelEntries.indexOf(model);
 				if(canvasImageModelIndex < 0)
 				{
-					canvasImageModels[x][y].push(model);
+					canvasImageModelIndex = 0;
+					for(canvasImageModelIndex = 0; canvasImageModelIndex < canvasImageModelEntries.length; ++canvasImageModelIndex)
+					{
+						model_ = canvasImageModelEntries[canvasImageModelIndex];
+						if(model.getDepth() <= model_.getDepth())
+						{
+							// move on - will be drawn later
+						}
+						else
+						{
+							break;
+						}
+					}
+					canvasImageModels[x][y].splice(canvasImageModelIndex, 0, model);
 				}
 				pixel = {r:0,g:0,b:0,a:0};
 				if(backgroundColor)
@@ -459,7 +486,8 @@ VolaryView.prototype.drawModel = function(model)
 				}
 				for(canvasImageModelIndex = 0; canvasImageModelIndex < canvasImageModelEntries.length; ++canvasImageModelIndex)
 				{
-					pixel = model.drawPixel(this, positionModel, pixel, canvasImageModelEntries);
+					model_ = canvasImageModelEntries[canvasImageModelIndex];
+					pixel = model_.drawPixel(this, positionModel, pixel, canvasImageModelEntries);
 				}
 				imageDataIndex = 4*(x + y * this.getWidth());
 				
@@ -467,6 +495,9 @@ VolaryView.prototype.drawModel = function(model)
 				canvasImageData.data[imageDataIndex + 1] = pixel.g;
 				canvasImageData.data[imageDataIndex + 2] = pixel.b;
 				canvasImageData.data[imageDataIndex + 3] = pixel.a;
+				
+				//volary1.viewsDraw();
+
 			}
 		}
 	}
@@ -746,9 +777,9 @@ VolaryPixel.prototype.getDepth = function()
 
 VolaryPixel.prototype.setDepth = function(depth)
 {
-	this.changeModelStart();
+	//this.changeModelStart();
 	this.depth = depth;
-	this.changeModelEnd();
+	//this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getColor = function()
