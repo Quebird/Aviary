@@ -7,6 +7,7 @@ function Volary()
 	this.version = "0.0.1";
 	this.id = undefined;
 	this.models = [];
+	this.modelsChanged = [];
 	this.modelsChangesStarted = 0;
 	this.modelsChangesEnded = 0;
 	this.views = [];
@@ -51,7 +52,7 @@ Volary.prototype.modelsRemove = function(model)
 	var index = this.models.indexOf(model);
 	if(0 <= index)
 	{
-		this.models = this.models.slice(index, index+1);
+		this.models.splice(index, 1);
 		model.setVolary(undefined);
 		success = true;
 	}
@@ -68,6 +69,7 @@ Volary.prototype.onModelChangeStarted = function(model)
 		view = this.views[index];
 		view.eraseModel(model);
 	}
+	this.modelsChanged.push(model);
 }
 
 Volary.prototype.onModelChangeEnded = function(model)
@@ -79,6 +81,7 @@ Volary.prototype.onModelChangeEnded = function(model)
 		view = this.views[index];
 		view.drawModel(model);
 	}
+	
 }
 
 
@@ -99,6 +102,16 @@ Volary.prototype.modelsChangesEndedGet = function()
 
 Volary.prototype.modelsChangesEnd = function()
 {
+	//var index;
+	var model;
+	while(0 < this.modelsChanged.length)
+	//for(index = 0; index < this.modelsChanged.length; ++index)
+	{
+		model = this.modelsChanged[0];
+		this.modelsChanged.splice(0, 1);
+		model.changeModelEnd();
+	}
+	
 	this.modelsChangesEnded = this.modelsChangesStarted;
 }
 
@@ -124,7 +137,7 @@ Volary.prototype.viewsRemove = function(view)
 	var index = this.views.indexOf(view);
 	if(0 <= index)
 	{
-		this.views = this.views.slice(index, index+1);
+		this.views.splice(index, 1);
 		view.setVolary(undefined);
 		success = true;
 	}
@@ -170,7 +183,8 @@ function VolaryView()
 		backgroundColor : undefined,
 		imageData		: undefined,
 		imageModels		: undefined,
-		backgroundDrawn : false
+		backgroundDrawn : false,
+		ctx				: undefined
 	};
 	this.modelsChangeDrawn = -1;
 }
@@ -214,6 +228,7 @@ VolaryView.prototype.updateDocumentElement = function()
 		canvasDocumentElement.width = this.getWidth();
 		canvasDocumentElement.height = this.getHeight();
 		var ctx = canvasDocumentElement.getContext('2d');
+		this.setCanvasContext(ctx);
 		var canvasImageData = ctx.createImageData(this.getWidth(), this.getHeight());
 		//var canvasImageModels = [];
 		var rowArray = [];
@@ -256,6 +271,16 @@ VolaryView.prototype.getCanvasImageModels = function()
 VolaryView.prototype.setCanvasImageModels = function(canvasImageModels)
 {
 	this.canvas.imageModels = canvasImageModels;
+}
+
+VolaryView.prototype.getCanvasContext = function()
+{
+	return this.canvas.ctx;
+}
+
+VolaryView.prototype.setCanvasContext = function(canvasContext)
+{
+	this.canvas.ctx = canvasContext;
 }
 
 VolaryView.prototype.getPosition = function()
@@ -374,7 +399,8 @@ VolaryView.prototype.eraseModel = function(model)
 		var modelsChange2Apply = volary.modelsChangesStartedGet();
 		var canvasDocumentElement = this.getCanvasDocumentElement();
 		var canvasImageModels = this.getCanvasImageModels();
-		var ctx = canvasDocumentElement.getContext("2d");
+		//var ctx = canvasDocumentElement.getContext("2d");
+		var ctx = this.getCanvasContext();
 		var canvasImageData = this.getCanvasImageData();
 		var backgroundColor = this.getBackgroundColor();
         var imageDataIndex;
@@ -392,10 +418,6 @@ VolaryView.prototype.eraseModel = function(model)
 			if(this.isPointWithin(positionModel))
 			{
 				x = positionModel.x - positionView.x;
-				if(!x)
-				{
-					console.log("!x");
-				}
 				y = positionModel.y - positionView.y;
 				canvasImageModelEntries = canvasImageModels[x][y];
 				var canvasImageModelIndex = canvasImageModelEntries.indexOf(model);
@@ -436,7 +458,8 @@ VolaryView.prototype.drawModel = function(model)
 		var modelsChange2Apply = volary.modelsChangesStartedGet();
 		var canvasDocumentElement = this.getCanvasDocumentElement();
 		var canvasImageModels = this.getCanvasImageModels();
-		var ctx = canvasDocumentElement.getContext("2d");
+//		var ctx = canvasDocumentElement.getContext("2d");
+		var ctx = this.getCanvasContext();
 		var canvasImageData = this.getCanvasImageData();
 		var backgroundColor = this.getBackgroundColor();
         var imageDataIndex;
@@ -455,10 +478,6 @@ VolaryView.prototype.drawModel = function(model)
 			{
 				x = positionModel.x - positionView.x;
 				y = positionModel.y - positionView.y;
-				if(!x)
-				{
-					console.log("!x");
-				}
 				
 				canvasImageModelEntries = canvasImageModels[x][y];
 				var canvasImageModelIndex = canvasImageModelEntries.indexOf(model);
@@ -511,7 +530,8 @@ VolaryView.prototype.drawModels = function()
 	{
 		var canvasDocumentElement = this.getCanvasDocumentElement();
 		var canvasImageModels = this.getCanvasImageModels();
-		var ctx = canvasDocumentElement.getContext("2d");
+//		var ctx = canvasDocumentElement.getContext("2d");
+		var ctx = this.getCanvasContext();
 		var canvasImageData = this.getCanvasImageData();
 		var backgroundColor = this.getBackgroundColor();
         var imageDataIndex;
@@ -562,7 +582,8 @@ VolaryView.prototype.draw = function()
 		}
 		var modelsChange2Apply = volary.modelsChangesEndedGet();
 		var canvasDocumentElement = this.getCanvasDocumentElement();
-		var ctx = canvasDocumentElement.getContext("2d");
+//		var ctx = canvasDocumentElement.getContext("2d");
+		var ctx = this.getCanvasContext();
 		var canvasImageData = this.getCanvasImageData();
 /*		var backgroundColor = this.getBackgroundColor();
 		if(backgroundColor)
@@ -648,7 +669,13 @@ function VolaryPixel()
 		h : 1
 	}
 	this.depth = undefined;
-	this.color = undefined;
+	this.color = 
+	{
+		r : undefined,
+		g : undefined,
+		b : undefined,
+		a : undefined
+	};
 	this.modelsChange = 0;
 }
 
@@ -675,8 +702,12 @@ VolaryPixel.prototype.changeModelStart = function()
 	var volary = this.getVolary();
 	if(volary)
 	{
-		this.modelsChange = volary.modelsChangesStartedGet();
-		volary.onModelChangeStarted(this);
+		var modelChangesStarted = volary.modelsChangesStartedGet();
+		if(this.modelsChange != modelChangesStarted)
+		{
+			this.modelsChange = modelChangesStarted;
+			volary.onModelChangeStarted(this);
+		}
 	}
 }
 
@@ -688,6 +719,7 @@ VolaryPixel.prototype.changeModelEnd = function()
 		volary.onModelChangeEnded(this);
 	}
 }
+
 
 VolaryPixel.prototype.getID = function()
 {
@@ -706,8 +738,9 @@ VolaryPixel.prototype.getPosition = function()
 VolaryPixel.prototype.setPosition = function(position)
 {
 	this.changeModelStart();
-	this.position = position;
-	this.changeModelEnd();
+	this.position.x = position.x;
+	this.position.y = position.y;
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getX = function()
@@ -719,7 +752,7 @@ VolaryPixel.prototype.setX = function(x)
 {
 	this.changeModelStart();
 	this.position.x = x;
-	this.changeModelEnd();
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getY = function()
@@ -731,19 +764,20 @@ VolaryPixel.prototype.setY = function(y)
 {
 	this.changeModelStart();
 	this.position.y = y;
-	this.changeModelEnd();
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.setSize = function(size)
 {
 	this.changeModelStart();
-	this.size = size;
-	this.changeModelEnd();
+	this.size.w = size.w;
+	this.size.h = size.h;
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getSize = function()
 {
-	return this.size;
+	return { w : this.size.w, h : this.size.h };
 }
 
 VolaryPixel.prototype.getWidth = function()
@@ -755,7 +789,7 @@ VolaryPixel.prototype.setWidth = function(width)
 {
 	this.changeModelStart();
 	this.size.w = width;
-	this.changeModelEnd();
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getHeight = function()
@@ -767,7 +801,7 @@ VolaryPixel.prototype.setHeight = function(height)
 {
 	this.changeModelStart();
 	this.size.h = height;
-	this.changeModelEnd();
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getDepth = function()
@@ -777,9 +811,9 @@ VolaryPixel.prototype.getDepth = function()
 
 VolaryPixel.prototype.setDepth = function(depth)
 {
-	//this.changeModelStart();
+	this.changeModelStart();
 	this.depth = depth;
-	//this.changeModelEnd();
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.getColor = function()
@@ -790,8 +824,11 @@ VolaryPixel.prototype.getColor = function()
 VolaryPixel.prototype.setColor = function(color)
 {
 	this.changeModelStart();
-	this.color = color;
-	this.changeModelEnd();
+	this.color.r = color.r;
+	this.color.g = color.g;
+	this.color.b = color.b;
+	this.color.a = color.a;
+//	this.changeModelEnd();
 }
 
 VolaryPixel.prototype.drawPixel = function(view, position, pixel, models)
