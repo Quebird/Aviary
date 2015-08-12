@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <script type="text/javascript" src="../../lib/0.0.1/quebird_volary.js"></script>
-<title>Volary - 2 Pixel lines in 4 Colored Views Alive</title>
+<title>Volary - 2 Pixel squares in 4 Colored Views Blending</title>
 <script type="text/javascript">
 	var volary1 = new Volary();
 	var pixelLineCount = 150;
@@ -14,6 +14,8 @@
 	var delta2MoveY = 0;
 	var depth2Move = 0;
 	var depthMoveUp = true;
+	var alphaTop = 0;
+	var color = {r : undefined, g : undefined, b : undefined, a : undefined};
 	
 	window.onload = function(e) 
 	{ 
@@ -69,12 +71,12 @@
 				volaryPixel.setPosition({x:(25+1*indexX), y:(25 + 1*indexY)});
 				if(pixelLineCount/2 <= indexX)
 				{
-					volaryPixel.setColor({r:255,g:0,b:0,a:255});
+					volaryPixel.setColor({r:255,g:0,b:0,a:(255/2)});
 					volaryPixel.setDepth(0);
 				}
 				else
 				{
-					volaryPixel.setColor({r:0,g:255,b:0,a:255});
+					volaryPixel.setColor({r:0,g:0,b:255,a:(255/2)});
 					volaryPixel.setDepth(1);
 				}
 				volary1.modelsAdd(volaryPixel);
@@ -96,6 +98,7 @@
 				{
 					delta2MoveX = -1;
 					delta2MoveY = -1;
+					alphaTop = 255/2;
 					moveStrategy = 1;
 				}
 				break;
@@ -103,6 +106,7 @@
 				{
 					delta2MoveX = 0;
 					delta2MoveY = 0;
+					alphaTop = (3*255)/4;
 					moveStrategy = 2;
 				}
 				break;
@@ -120,6 +124,7 @@
 					}
 					delta2MoveX = 1;
 					delta2MoveY = 1;
+					alphaTop = 255/2;
 					moveStrategy = 3;
 				}
 				break;
@@ -127,6 +132,7 @@
 				{
 					delta2MoveX = 0;
 					delta2MoveY = 0;
+					alphaTop = (1*255)/4;
 					moveStrategy = 0;
 				}
 				break;
@@ -150,6 +156,9 @@
 					pos.y += sign * delta2MoveY;
 					volaryPixel.setDepth(depth2Move);
 					volaryPixel.setPosition(pos);
+					volaryPixel.getColor(color);
+					color.a = alphaTop;
+					volaryPixel.setColor(color);
 				}
 	//			volaryPixel.setX(volaryPixel.getX() + delta2MoveX);
 	//			volaryPixel.setY(volaryPixel.getY() + delta2MoveY);
