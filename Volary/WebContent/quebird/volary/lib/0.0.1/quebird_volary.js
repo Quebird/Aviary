@@ -800,6 +800,7 @@ function VolaryPixel()
 		x : undefined,
 		y : undefined
 	};
+	this.positionObservers = [];
 	this.size =
 	{
 		w : 1,
@@ -841,6 +842,7 @@ VolaryPixel.prototype.setPosition = function(position)
 	this.changeModelStart();
 	this.position.x = position.x;
 	this.position.y = position.y;
+	this.notifyPositionObservers(this.position);
 //	this.changeModelEnd();
 }
 
@@ -853,6 +855,7 @@ VolaryPixel.prototype.setX = function(x)
 {
 	this.changeModelStart();
 	this.position.x = x;
+	this.notifyPositionObservers(this.position);
 //	this.changeModelEnd();
 }
 
@@ -865,7 +868,48 @@ VolaryPixel.prototype.setY = function(y)
 {
 	this.changeModelStart();
 	this.position.y = y;
+	this.notifyPositionObservers(this.position);
 //	this.changeModelEnd();
+}
+
+VolaryPixel.prototype.addPositionObserver = function(observer)
+{
+	var success = false;
+	
+	var index = this.positionObservers.indexOf(observer);
+	if(index < 0)
+	{
+		this.positionObservers.push(observer);
+		success = true;
+	}
+	
+	return success;
+}
+
+VolaryPixel.prototype.removePositionObserver = function(observer)
+{
+	var success = false;
+	
+	var index = this.positionObservers.indexOf(observer);
+	if(0 <= index)
+	{
+		this.positionObservers.splice(index, 1);
+		success = true;
+	}
+	
+	return success;
+}
+
+VolaryPixel.prototype.notifyPositionObservers = function(position)
+{
+	var observer = undefined;
+	var length = this.positionObservers.length;
+	//while(0 < this.modelsChanged.length)
+	for(index = 0; index < length; ++index)
+	{
+		observer = this.positionObservers[index];
+		observer.onModelPositionChange(this, position);
+	}
 }
 
 VolaryPixel.prototype.setSize = function(size)
@@ -1004,4 +1048,97 @@ VolaryPixel.prototype.drawPixel = function(view, position, pixelOut, models)
 		}
 	}
 */
+}
+
+
+
+/**
+ * Pixel Link - Model Object
+ */
+function VolaryPixelLink()
+{
+	//this.id = undefined;
+	AVolaryModel.call(this);
+	
+	this.target = undefined;
+	this.chaser = undefined;
+
+	this.deltaPosition = 
+	{
+		x : undefined,
+		y : undefined
+	};
+}
+
+VolaryPixelLink.prototype = Object.create(AVolaryModel.prototype);
+
+VolaryPixelLink.prototype.constructor = VolaryPixelLink;
+
+VolaryPixelLink.prototype.getDeltaPosition = function(deltaPositionOut)
+{
+	if(!deltaPositionOut)
+	{
+		deltaPositionOut = {x : this.deltaPosition.x, y : this.deltaPosition.y};
+	}
+	else
+	{
+		deltaPositionOut.x = this.deltaPosition.x;
+		deltaPositionOut.y = this.deltaPosition.y;
+	}
+	return deltaPositionOut;
+	//return {x:this.position.x, y:this.position.y};
+}
+
+VolaryPixelLink.prototype.setDeltaPosition = function(deltaPosition)
+{
+	this.deltaPosition.x = deltaPosition.x;
+	this.deltaPosition.y = deltaPosition.y;
+}
+
+VolaryPixelLink.prototype.getDeltaX = function()
+{
+	return this.deltaPosition.x;
+}
+
+VolaryPixelLink.prototype.setDeltaX = function(x)
+{
+	this.deltaPosition.x = x;
+}
+
+VolaryPixelLink.prototype.getDeltaY = function()
+{
+	return this.deltaPosition.y;
+}
+
+VolaryPixelLink.prototype.setDeltaY = function(y)
+{
+	this.deltaPosition.y = y;
+}
+
+VolaryPixelLink.prototype.establishLink = function(target, chaser)
+{
+	this.target = target;
+	this.target.addPositionObserver(this);
+	this.chaser = chaser;
+}
+
+VolaryPixelLink.prototype.breakLink = function()
+{
+	this.target.removePositionObserver(this);
+	this.target = null;
+	this.chaser = null;
+}
+
+VolaryPixelLink.prototype.onModelPositionChange = function(model, position)
+{
+	if(model == this.target)
+	{
+		if(this.chaser)
+		{
+			var chaserPosition = {x : undefined, y : undefined};
+			chaserPosition.x = position.x + this.deltaPosition.x;
+			chaserPosition.y = position.y + this.deltaPosition.y;
+			this.chaser.setPosition(chaserPosition);
+		}
+	}
 }
