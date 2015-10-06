@@ -770,6 +770,10 @@ AVolaryModel.prototype.changeModelStart = function()
 		var modelChangesStarted = volary.modelsChangesStartedGet();
 		if(modelsChange != modelChangesStarted)
 		{
+			if(modelsChange - modelChangesStarted == 0)
+			{
+				alert('wtf ' + typeof(modelsChange) + ' ' + typeof(modelsChangeStarted));
+			}
 			this.setModelsChange(modelChangesStarted);
 			volary.modelChangeStart(this);
 		}
@@ -784,6 +788,26 @@ AVolaryModel.prototype.changeModelEnd = function()
 		volary.modelChangeEnd(this);
 	}
 }
+AVolaryModel.prototype.logIfNaN = function(data, name)
+{
+	if(isNaN(data))
+	{
+		console.log('data ' + name + 'is NaN');
+	};
+}
+AVolaryModel.prototype.logIfUndefined = function(data, name)
+{
+	if(typeof data === "undefined")
+	{
+		console.log('data ' + name + 'is NaN');
+	};
+}
+AVolaryModel.prototype.logIfUndefinedOrNaN = function(data, name)
+{
+	this.logIfUndefined(data, name);
+	this.logIfNaN(data, name);
+}
+
 
 
 /**
@@ -806,7 +830,7 @@ function VolaryPixel()
 		w : 1,
 		h : 1
 	}
-	this.depth = undefined;
+	this.depth = 0;
 	this.color = 
 	{
 		r : undefined,
@@ -840,6 +864,9 @@ VolaryPixel.prototype.getPosition = function(positionOut)
 VolaryPixel.prototype.setPosition = function(position)
 {
 	this.changeModelStart();
+	this.logIfUndefined(position, 'position');
+	this.logIfUndefinedOrNaN(position.x, 'position.x');
+	this.logIfUndefinedOrNaN(position.y, 'position.y');
 	this.position.x = position.x;
 	this.position.y = position.y;
 	this.notifyPositionObservers(this.position);
@@ -854,6 +881,7 @@ VolaryPixel.prototype.getX = function()
 VolaryPixel.prototype.setX = function(x)
 {
 	this.changeModelStart();
+	this.logIfUndefinedOrNaN(x, 'x');
 	this.position.x = x;
 	this.notifyPositionObservers(this.position);
 //	this.changeModelEnd();
@@ -867,6 +895,7 @@ VolaryPixel.prototype.getY = function()
 VolaryPixel.prototype.setY = function(y)
 {
 	this.changeModelStart();
+	this.logIfUndefinedOrNaN(y, 'y');
 	this.position.y = y;
 	this.notifyPositionObservers(this.position);
 //	this.changeModelEnd();
@@ -914,9 +943,9 @@ VolaryPixel.prototype.notifyPositionObservers = function(position)
 
 VolaryPixel.prototype.setSize = function(size)
 {
-	this.changeModelStart();
-	this.size.w = size.w;
-	this.size.h = size.h;
+	this.logIfUndefined(size, 'size');
+	this.setWidth(size.w);
+	this.setHeight(size.h);
 //	this.changeModelEnd();
 }
 
@@ -942,6 +971,7 @@ VolaryPixel.prototype.getWidth = function()
 VolaryPixel.prototype.setWidth = function(width)
 {
 	this.changeModelStart();
+	this.logIfUndefinedOrNaN(width, 'width');
 	this.size.w = width;
 //	this.changeModelEnd();
 }
@@ -954,6 +984,7 @@ VolaryPixel.prototype.getHeight = function()
 VolaryPixel.prototype.setHeight = function(height)
 {
 	this.changeModelStart();
+	this.logIfUndefinedOrNaN(height, 'height');
 	this.size.h = height;
 //	this.changeModelEnd();
 }
@@ -966,6 +997,7 @@ VolaryPixel.prototype.getDepth = function()
 VolaryPixel.prototype.setDepth = function(depth)
 {
 	this.changeModelStart();
+	this.logIfUndefinedOrNaN(depth, 'depth');
 	this.depth = depth;
 //	this.changeModelEnd();
 }
@@ -995,6 +1027,10 @@ VolaryPixel.prototype.getColor = function(colorOut)
 VolaryPixel.prototype.setColor = function(color)
 {
 	this.changeModelStart();
+	this.logIfUndefinedOrNaN(color.r, 'color.r');
+	this.logIfUndefinedOrNaN(color.g, 'color.g');
+	this.logIfUndefinedOrNaN(color.b, 'color.b');
+	this.logIfUndefinedOrNaN(color.a, 'color.a');
 	this.color.r = color.r;
 	this.color.g = color.g;
 	this.color.b = color.b;
@@ -1142,3 +1178,73 @@ VolaryPixelLink.prototype.onModelPositionChange = function(model, position)
 		}
 	}
 }
+
+/**
+ * PixelGroup - Model Object (that also can draw itself)
+ */
+function VolaryPixelGroup()
+{
+	//this.id = undefined;
+	AVolaryModel.call(this);
+
+	this.pixelGroup = [];
+}
+
+VolaryPixelGroup.prototype = Object.create(AVolaryModel.prototype);
+
+VolaryPixelGroup.prototype.constructor = VolaryPixelGroup;
+
+VolaryPixelGroup.prototype.addPixel = function(volaryPixel)
+{
+	var success = false;
+	
+	var index = this.pixelGroup.indexOf(volaryPixel);
+	if(index < 0)
+	{
+		this.pixelGroup.push(volaryPixel);
+		success = true;
+	}
+	
+	return success;
+}
+
+VolaryPixelGroup.prototype.removePixel = function(volaryPixel)
+{
+	var success = false;
+	
+	var index = this.models.indexOf(volaryPixel);
+	if(0 <= index)
+	{
+		this.pixelGroup.splice(index, 1);
+		success = true;
+	}
+	
+	return success;
+}
+
+VolaryPixelGroup.prototype.translate = function(deltaX, deltaY, deltaZ)
+{
+	var volaryPixel = undefined;
+	var length = this.pixelGroup.length;
+	var index = 0;
+//	if(deltaZ)
+	{
+		for(index = 0; index < length; ++index)
+		{
+			volaryPixel = this.pixelGroup[index];
+			volaryPixel.setX(volaryPixel.getX() + deltaX);
+			volaryPixel.setY(volaryPixel.getY() + deltaY);
+			volaryPixel.setDepth(volaryPixel.getDepth() + deltaZ);
+		}
+	}
+//	else
+//	{
+//		for(index = 0; index < length; ++index)
+//		{
+//			volaryPixel = this.pixelGroup[index];
+//			volaryPixel.setX(volaryPixel.getX() + deltaX);
+//			volaryPixel.setY(volaryPixel.getY() + deltaY);
+//		}
+//	}
+}
+
