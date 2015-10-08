@@ -722,32 +722,71 @@ VolaryView.createDocumentElement = function(id)
 
 
 /**
- * Abstract model. 
+ * Abstract object. 
  */
-function AVolaryModel()
+function AVolaryObject()
 {
 	this.id = undefined;
 	this.volary = undefined;
-	this.modelsChange = 0;
 }
 
-AVolaryModel.prototype.getID = function()
+AVolaryObject.prototype.getID = function()
 {
 	return this.id;
 }
-AVolaryModel.prototype.setID = function(id)
+AVolaryObject.prototype.setID = function(id)
 {
 	this.id = id;
 }
 
-AVolaryModel.prototype.getVolary = function()
+AVolaryObject.prototype.getVolary = function()
 {
 	return this.volary;
 }
+AVolaryObject.prototype.setVolary = function(volary)
+{
+	this.volary = volary;
+}
+
+AVolaryObject.prototype.logIfNaN = function(data, name)
+{
+	if(isNaN(data))
+	{
+		console.log('data ' + name + 'is NaN');
+	};
+}
+AVolaryObject.prototype.logIfUndefined = function(data, name)
+{
+	if(typeof data === "undefined")
+	{
+		console.log('data ' + name + 'is NaN');
+	};
+}
+AVolaryObject.prototype.logIfUndefinedOrNaN = function(data, name)
+{
+	this.logIfUndefined(data, name);
+	this.logIfNaN(data, name);
+}
+
+
+/**
+ * Abstract model. 
+ */
+function AVolaryModel()
+{
+	AVolaryObject.call(this);
+
+	this.modelsChange = 0;
+}
+
+AVolaryModel.prototype = Object.create(AVolaryObject.prototype);
+
+AVolaryModel.prototype.constructor = AVolaryModel;
+
 AVolaryModel.prototype.setVolary = function(volary)
 {
 	this.changeModelStart();
-	this.volary = volary;
+	AVolaryObject.prototype.setVolary.call(this, volary);
 	this.changeModelEnd();
 }
 
@@ -787,25 +826,6 @@ AVolaryModel.prototype.changeModelEnd = function()
 	{
 		volary.modelChangeEnd(this);
 	}
-}
-AVolaryModel.prototype.logIfNaN = function(data, name)
-{
-	if(isNaN(data))
-	{
-		console.log('data ' + name + 'is NaN');
-	};
-}
-AVolaryModel.prototype.logIfUndefined = function(data, name)
-{
-	if(typeof data === "undefined")
-	{
-		console.log('data ' + name + 'is NaN');
-	};
-}
-AVolaryModel.prototype.logIfUndefinedOrNaN = function(data, name)
-{
-	this.logIfUndefined(data, name);
-	this.logIfNaN(data, name);
 }
 
 
@@ -1180,17 +1200,17 @@ VolaryPixelLink.prototype.onModelPositionChange = function(model, position)
 }
 
 /**
- * PixelGroup - Model Object (that also can draw itself)
+ * PixelGroup - Object
  */
 function VolaryPixelGroup()
 {
 	//this.id = undefined;
-	AVolaryModel.call(this);
+	AVolaryObject.call(this);
 
 	this.pixelGroup = [];
 }
 
-VolaryPixelGroup.prototype = Object.create(AVolaryModel.prototype);
+VolaryPixelGroup.prototype = Object.create(AVolaryObject.prototype);
 
 VolaryPixelGroup.prototype.constructor = VolaryPixelGroup;
 
@@ -1222,29 +1242,192 @@ VolaryPixelGroup.prototype.removePixel = function(volaryPixel)
 	return success;
 }
 
-VolaryPixelGroup.prototype.translate = function(deltaX, deltaY, deltaZ)
+VolaryPixelGroup.prototype.translate = function(deltaX, deltaY, deltaZOrUndefined)
 {
 	var volaryPixel = undefined;
 	var length = this.pixelGroup.length;
 	var index = 0;
-//	if(deltaZ)
+	if(typeof deltaZOrUndefined === "undefined")
 	{
 		for(index = 0; index < length; ++index)
 		{
 			volaryPixel = this.pixelGroup[index];
 			volaryPixel.setX(volaryPixel.getX() + deltaX);
 			volaryPixel.setY(volaryPixel.getY() + deltaY);
-			volaryPixel.setDepth(volaryPixel.getDepth() + deltaZ);
 		}
 	}
-//	else
-//	{
-//		for(index = 0; index < length; ++index)
-//		{
-//			volaryPixel = this.pixelGroup[index];
-//			volaryPixel.setX(volaryPixel.getX() + deltaX);
-//			volaryPixel.setY(volaryPixel.getY() + deltaY);
-//		}
-//	}
+	else
+	{
+		for(index = 0; index < length; ++index)
+		{
+			volaryPixel = this.pixelGroup[index];
+			volaryPixel.setX(volaryPixel.getX() + deltaX);
+			volaryPixel.setY(volaryPixel.getY() + deltaY);
+			volaryPixel.setDepth(volaryPixel.getDepth() + deltaZOrUndefined);
+		}
+	}
 }
 
+
+/**
+ * VolaryTranslate - Object
+ */
+function VolaryTranslate()
+{
+	//this.id = undefined;
+	AVolaryObject.call(this);
+	
+	this.pixelGroup = undefined;
+	this.durationMS = 0;
+	this.deltaX = 0;
+	this.deltaY = 0;
+	this.deltaZ = 0;
+//	this.repeat = false;
+	this.bounce = true;
+	this.done = true;
+	this.durationCurrentMS = 0;
+	this.deltaXCurrent = 0;
+	this.deltaYCurrent = 0;
+	this.deltaZCurrent = 0;
+	this.bouncing = 1;
+}
+
+VolaryTranslate.prototype = Object.create(AVolaryObject.prototype);
+
+VolaryTranslate.prototype.constructor = VolaryPixelGroup;
+
+VolaryTranslate.prototype.getPixelGroup = function()
+{
+	return this.pixelGroup;
+}
+VolaryTranslate.prototype.setPixelGroup = function(pixelGroup)
+{
+	this.pixelGroup = pixelGroup;
+}
+
+VolaryTranslate.prototype.getDeltaX = function()
+{
+	return this.deltaX;
+}
+VolaryTranslate.prototype.setDeltaX = function(deltaX)
+{
+	this.deltaX = deltaX;
+}
+
+VolaryTranslate.prototype.getDeltaY = function()
+{
+	return this.deltaY;
+}
+VolaryTranslate.prototype.setDeltaY = function(deltaY)
+{
+	this.deltaY = deltaY;
+}
+
+VolaryTranslate.prototype.getDurationMS = function()
+{
+	return this.durationMS;
+}
+VolaryTranslate.prototype.setDurationMS = function(durationMS)
+{
+	this.durationMS = durationMS;
+}
+
+VolaryTranslate.prototype.getBounce = function()
+{
+	return this.bounce;
+}
+VolaryTranslate.prototype.setBounce = function(repeat)
+{
+	this.bounce = bounce;
+}
+
+VolaryTranslate.prototype.getDone = function()
+{
+	return this.done;
+}
+VolaryTranslate.prototype.setDone = function(done)
+{
+	this.done = done;
+}
+
+//VolaryTranslate.prototype.getRepeat = function()
+//{
+//	return this.repeat;
+//}
+//VolaryTranslate.prototype.setRepeat = function(repeat)
+//{
+//	this.repeat = repeat;
+//}
+
+VolaryTranslate.prototype.update = function(deltaTimeMS)
+{
+	var loop = true;
+	var durationCurrentMSNew;
+	var deltaXToApply = 0;
+	var deltaYToApply = 0;
+	var k = 0;
+	if(!this.done)
+	{
+		durationCurrentMSNew = this.durationCurrentMS + deltaTimeMS;
+		while(loop)
+		{
+			if(this.durationMS <= durationCurrentMSNew)
+			{
+				durationCurrentMSNew -= this.durationMS;
+				this.durationCurrentMS = durationCurrentMSNew;
+				if(this.bouncing < 0)
+				{
+					deltaXToApply += -this.deltaXCurrent;
+					deltaYToApply += -this.deltaYCurrent;
+					this.deltaXCurrent = 0;
+					this.deltaYCurrent = 0;
+				}
+				else
+				{
+					deltaXToApply += Math.floor(this.deltaX - this.deltaXCurrent);
+					deltaYToApply += Math.floor(this.deltaY - this.deltaYCurrent);
+					this.deltaXCurrent = this.deltaX;
+					this.deltaYCurrent = this.deltaY;
+				}
+				if(this.bounce)
+				{
+					this.bouncing *= -1;
+				}
+			}
+			else
+			{
+				this.durationCurrentMS = durationCurrentMSNew;
+				// interpolate
+				k = (this.durationCurrentMS / this.durationMS);
+				if(this.bouncing < 0)
+				{
+					deltaXToApply += Math.ceil((1-k) * this.deltaX) - this.deltaXCurrent;
+					deltaYToApply += Math.ceil((1-k) * this.deltaY) - this.deltaYCurrent;
+					this.deltaXCurrent = Math.ceil((1-k) * this.deltaX);
+					this.deltaYCurrent = Math.ceil((1-k) * this.deltaY);
+				}
+				else
+				{
+					deltaXToApply += Math.floor(k * this.deltaX) - this.deltaXCurrent;
+					deltaYToApply += Math.floor(k * this.deltaY) - this.deltaYCurrent;
+					this.deltaXCurrent = Math.floor(k * this.deltaX);
+					this.deltaYCurrent = Math.floor(k * this.deltaY);
+				}
+				loop = false;
+			}
+		}
+		
+		var volaryPixel = undefined;
+		var length = this.pixelGroup.pixelGroup.length;
+		var index = 0;
+	//	if(typeof deltaZOrUndefined === "undefined")
+		{
+			for(index = 0; index < length; ++index)
+			{
+				volaryPixel = this.pixelGroup.pixelGroup[index];
+				volaryPixel.setX(volaryPixel.getX() + deltaXToApply);
+				volaryPixel.setY(volaryPixel.getY() + deltaYToApply);
+			}
+		}
+	}
+}

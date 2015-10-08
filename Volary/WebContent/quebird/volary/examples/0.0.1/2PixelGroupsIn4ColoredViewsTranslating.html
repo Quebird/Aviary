@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <script type="text/javascript" src="../../lib/0.0.1/quebird_volary.js"></script>
-<title>Volary - 2 Pixel groups in 4 Colored Views Alive</title>
+<title>Volary - 2 Pixel groups in 4 Colored Views Translating</title>
 <script type="text/javascript">
 	var volary1 = new Volary();
 	var pixelLineCount = 40;
 	var frameCount = 0;
+	var deltaTimeMS = 0;
+	var timestampLast = 0;
 	var moveStrategy = 0;
 	var pixel2Move = 0;
 	var delta2MoveX = 0;
@@ -16,6 +18,8 @@
 	var depthMoveUp = true;
 	var pixelGroup1 = new VolaryPixelGroup();
 	var pixelGroup2 = new VolaryPixelGroup();
+	var groupTranslate1 = new VolaryTranslate();
+	var groupTranslate2 = new VolaryTranslate();
 	
 	window.onload = function(e) 
 	{ 
@@ -81,85 +85,32 @@
 			volary1.modelsAdd(volaryPixel);
 		}
 		
+		groupTranslate1.setPixelGroup(pixelGroup1);
+		groupTranslate1.setDeltaX(100);
+		groupTranslate1.setDurationMS(500);
+		groupTranslate1.setDone(false);
+		
+ 		groupTranslate2.setPixelGroup(pixelGroup2);
+ 		groupTranslate2.setDeltaY(100);
+ 		groupTranslate2.setDurationMS(1000);
+		groupTranslate2.setDone(false);
+		
 	    window.requestAnimationFrame(myAnimationFrameUpdate);
 	}
 	myAnimationFrameUpdate = function(timestamp)
 	{
 		volary1.modelsChangesStart();
 		
-		pixel2Move = frameCount % 20;
-		depth2Move = 0;
-		if(pixel2Move == 0)
-		{ // move 1 pixel each frame
-			switch(moveStrategy)
-			{
-				case 0:
-				{
-					delta2MoveX = -1;
-					delta2MoveY = -1;
-					moveStrategy = 1;
-				}
-				break;
-				case 1:
-				{
-					delta2MoveX = 0;
-					delta2MoveY = 0;
-					moveStrategy = 2;
-				}
-				break;
-				case 2:
-				{
-					if(depthMoveUp)
-					{
-						depth2Move = -2;
-						depthMoveUp = false;
-					}
-					else
-					{
-						depth2Move = 2;
-						depthMoveUp = true;
-					}
-						
-					delta2MoveX = 1;
-					delta2MoveY = 1;
-					moveStrategy = 3;
-				}
-				break;
-				case 3:
-				{
-					delta2MoveX = 0;
-					delta2MoveY = 0;
-					moveStrategy = 0;
-				}
-				break;
-			}
-		}
-		
-		var volaryPixel;
-		var sign1 = 1;
-		var sign2 = -1;
-// 		var index;
-// 		var pos;
-// 		for(index = 0; index < pixelLineCount; ++index)
-// 		{ // add all pixels
-// 			volaryPixel = volary1.models[index];
-// 			if(pixelLineCount/2 <= index)
-// 			{
-// 				pos = volaryPixel.getPosition();
-// 				pos.x += sign * delta2MoveX;
-// 				pos.y += sign * delta2MoveY;
-// 				volaryPixel.setDepth(depth2Move);
-// 				volaryPixel.setPosition(pos);
-// 			}
-// 		}
-		pixelGroup1.translate(sign1 * delta2MoveX, sign1 * delta2MoveY);
-		pixelGroup2.translate(sign2 * delta2MoveX, sign2 * delta2MoveY, depth2Move);
+		deltaTimeMS = timestamp - timestampLast;
+		groupTranslate1.update(deltaTimeMS);
+		groupTranslate2.update(deltaTimeMS);
 		
 		volary1.modelsChangesEnd();
 		
 		volary1.viewsDraw();
-		window.requestAnimationFrame(myAnimationFrameUpdate);
 		frameCount++;
+		timestampLast = timestamp;
+		window.requestAnimationFrame(myAnimationFrameUpdate);
 	}
 </script>
 </head>
