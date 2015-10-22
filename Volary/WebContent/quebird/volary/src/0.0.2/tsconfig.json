@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es3",
+        "noImplicitAny": false,
+        "outFile": "../../lib/0.0.2/quebird.volary.0.0.2.js",
+        "rootDir": ".",
+        "sourceMap": false
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}

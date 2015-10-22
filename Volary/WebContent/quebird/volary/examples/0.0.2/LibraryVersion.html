@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../lib/0.0.2/quebird.volary.0.0.2.js"></script>
+<title>Volary - Library Version</title>
+<script type="text/javascript">
+	function introspectVolary()
+	{
+		document.getElementById("p1").textContent = "Volary library version: " + volary.version;
+	}
+</script>
+<script type="text/javascript">
+	window.onload = function(e) 
+	{ 
+		volary = new Volary.Volary();
+		introspectVolary();
+	}
+</script>
+</head>
+<body>
+
+<p id="p1"></p>
+
+</body>
+</html>

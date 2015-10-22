@@ -1,0 +1,16 @@
+/**
+ * All files are referenced here.
+ */
+ 
+/// <reference path="IInstance.ts" />
+/// <reference path="IModel.ts" />
+/// <reference path="IView.ts" />
+/// <reference path="IVolary.ts" />
+
+/// <reference path="AInstance.ts" />
+/// <reference path="AVolary.ts" />
+
+/// <reference path="Model.ts" />
+/// <reference path="View.ts" />
+/// <reference path="Volary.ts" />
+ 
