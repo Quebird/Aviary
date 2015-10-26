@@ -1,9 +1,12 @@
+/// <reference path="../instances/IInstance.ts" />
+/// <reference path="../properties/ILocationProperty.ts" />
+/// <reference path="../properties/IExtentProperty.ts" />
 module Volary {
 
     /**
      * View specification.
      */
-    export interface IView extends IInstance, IBackgroundColor, IHeight, IWidth
+    export interface IView extends IInstance, ILocationProperty, IExtentProperty
     {
         /**
          * Constructs a canvas in the DOM.

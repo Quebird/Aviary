@@ -41,14 +41,14 @@ module Volary {
             var context : CanvasRenderingContext2D;
             element = document.createElement('canvas');
             element.id = this.getId();
-            element.width = caller.getWidth();
-            element.height = caller.getHeight();
+            element.width = caller.getExtent().getX();
+            element.height = caller.getExtent().getY();
             document.getElementsByTagName('body') [0].appendChild(element);
             this.setElement(element);
             context = element.getContext("2d");
             this.setContext(context);
-            context.fillStyle = caller.getBackgroundColor().getRgbaString();
-            context.fillRect(0, 0, caller.getWidth(), caller.getHeight());
+//            context.fillStyle = caller.getBackgroundColor().getRgbaString();
+//            context.fillRect(0, 0, caller.getWidth(), caller.getHeight());
         }
         
         public attachToDocument(caller : IView, elementId : string)
@@ -57,13 +57,13 @@ module Volary {
             var context : CanvasRenderingContext2D;
             element = document.getElementById(elementId) as HTMLCanvasElement;
             this.setId(elementId);
-            caller.setHeight(element.height);
-            caller.setWidth(element.width);
+//            caller.setHeight(element.height);
+//            caller.setWidth(element.width);
             this.setElement(element);
             context = element.getContext("2d");
             this.setContext(context);
-            context.fillStyle = caller.getBackgroundColor().getRgbaString();
-            context.fillRect(0, 0, caller.getWidth(), caller.getHeight());
+//            context.fillStyle = caller.getBackgroundColor().getRgbaString();
+//            context.fillRect(0, 0, caller.getWidth(), caller.getHeight());
         }
         
         public detachFromDocument(caller : IView)

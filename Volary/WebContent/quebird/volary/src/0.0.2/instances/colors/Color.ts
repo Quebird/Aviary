@@ -10,6 +10,10 @@ module Volary {
         {
             super();
             this.initInstance("Color", Color.modelInstanceIndex);
+            this.setR(0);
+            this.setG(0);
+            this.setB(0);
+            this.setA(0);
             Color.modelInstanceIndex++;
         }
     }

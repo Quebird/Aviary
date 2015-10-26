@@ -1,4 +1,5 @@
 /// <reference path="../instances/AInstance.ts" />
+/// <reference path="../instances/positions/IPosition.ts" />
 /// <reference path="../instances/colors/Color.ts" />
 /// <reference path="canvases/Canvas.ts" />
 module Volary {
@@ -8,7 +9,7 @@ module Volary {
      */
     export abstract class AView extends AInstance implements IView {
         
-        private canvas: ICanvas = null;
+        private canvas: ICanvas;
         protected getCanvas()
         {
             return this.canvas;
@@ -18,34 +19,24 @@ module Volary {
             this.canvas = canvas;
         }
         
-        private backgroundColor : IColor = new Color();
-        public getBackgroundColor() : IColor
+        private location : IPosition;
+        public getLocation() : IPosition
         {
-            return this.backgroundColor;
+            return this.location;
         }
-        public setBackgroundColor(backgroundColor : IColor)
+        protected setLocation(location : IPosition)
         {
-            this.backgroundColor = backgroundColor;
-        }
-        
-        private height : number = 0;
-        public getHeight() : number
-        {
-            return this.height;
-        }
-        public setHeight(height: number)
-        {
-            this.height = height;
+            this.location = location;
         }
         
-        private width: number = 0;
-        public getWidth() : number
+        private extent : IPosition;
+        public getExtent() : IPosition
         {
-            return this.width;
+            return this.extent;
         }
-        public setWidth(width: number)
+        protected setExtent(extent : IPosition)
         {
-            this.width = width;
+            this.extent = extent;
         }
         
         constructor() 
@@ -66,6 +57,10 @@ module Volary {
         public attachCanvas(elementId : string)
         {
             var canvas = new Canvas();
+            var element : HTMLCanvasElement;
+            element = document.getElementById(elementId) as HTMLCanvasElement;
+            this.getExtent().setX(element.width);
+            this.getExtent().setY(element.height);
             canvas.attachToDocument(this, elementId);
             this.setCanvas(canvas);
         }

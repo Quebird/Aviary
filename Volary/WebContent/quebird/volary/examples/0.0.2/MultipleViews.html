@@ -13,8 +13,8 @@
 		volary1 = new Volary.Volary();
 		{
 			var volaryView1 = new Volary.View();
- 			volaryView1.getBackgroundColor().setR(255);
- 			volaryView1.getBackgroundColor().setA(255);
+ 			//volaryView1.getBackgroundColor().setR(255);
+ 			//volaryView1.getBackgroundColor().setA(255);
 			volaryView1.attachCanvas('MyCanvas');		
 // 			volaryView1.setID('canvas1');
 // 			volaryView1.setWidth(200);
@@ -40,11 +40,11 @@
 	example.onCreateButtonClick = function()
 	{
 		var volaryView = new Volary.View();
-		var alpha = 255 - ((32 * volary2.getViews().getViewCount()) % 256);
-		volaryView.getBackgroundColor().setG(255);
-		volaryView.getBackgroundColor().setA(alpha);
-		volaryView.setWidth(15);
-		volaryView.setHeight(150);
+		//var alpha = 255 - ((32 * volary2.getViews().getViewCount()) % 256);
+		//volaryView.getBackgroundColor().setG(255);
+		//volaryView.getBackgroundColor().setA(alpha);
+		volaryView.getExtent().setX(15);
+		volaryView.getExtent().setY(150);
 		volaryView.constructCanvas();			
 //			volaryView1.setID('canvas2');
 //			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});

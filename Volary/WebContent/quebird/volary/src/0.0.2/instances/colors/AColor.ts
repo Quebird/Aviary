@@ -6,7 +6,7 @@ module Volary {
      */
     export abstract class AColor extends AInstance implements IColor {
         
-        private r : number = 0;
+        private r : number;
         /**
          * Retrieves the amount of red in channel [0;255].
          */
@@ -22,7 +22,7 @@ module Volary {
             this.r = r;
         }
 
-        private g : number = 0;
+        private g : number;
         /**
          * Retrieves the amount of green in channel [0;255].
          */
@@ -38,7 +38,7 @@ module Volary {
             this.g = g;
         }
 
-        private b : number = 0;
+        private b : number;
         /**
          * Retrieves the amount of blue in channel [0;255].
          */
@@ -54,7 +54,7 @@ module Volary {
             this.b = b;
         }
 
-        private a : number = 0;
+        private a : number;
         /**
          * Retrieves the amount of alpha in channel [0;255].
          */
