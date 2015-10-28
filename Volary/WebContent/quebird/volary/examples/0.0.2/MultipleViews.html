@@ -5,12 +5,57 @@
 <script type="text/javascript" src="../../lib/0.0.2/quebird.volary.0.0.2.js"></script>
 <title>Volary - Multiple Views</title>
 <script type="text/javascript">
-	var volary1, volary2;
-	var example = {};
+	var example = 
+	{
+		volary1 : undefined,
+		volary2 : undefined,
+		deltaTimeMS : 0,
+		timestampLast : 0,
+		frameCount : 0
+	};
+	example.onCreateButtonClick = function()
+	{
+		var volaryView = new Volary.View();
+		var width = example.volary2.getViews().getViewCount();
+		//var alpha = 255 - ((32 * volary2.getViews().getViewCount()) % 256);
+		//volaryView.getBackgroundColor().setG(255);
+		//volaryView.getBackgroundColor().setA(alpha);
+		volaryView.getExtent().setX(2 + 2 * width);
+		volaryView.getExtent().setY(2 + 4 * width);
+		volaryView.constructCanvas();			
+//			volaryView1.setID('canvas2');
+//			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});
+//			var canvasDocumentElement2 = VolaryView.createDocumentElement(volaryView2.getID());
+//			volaryView2.attachCanvasDocumentElement(canvasDocumentElement2);
+		example.volary2.getViews().addView(volaryView);
+	}
+	example.onDeleteButtonClick = function()
+	{
+		var views = example.volary2.getViews();
+		var viewCount = views.getViewCount();
+		var view;
+		if(0 < viewCount)
+		{
+			view = views.getViewByIndex(viewCount-1);
+			views.removeView(view);
+			view.destructCanvas();
+		}
+	}
+	example.onAnimationFrameUpdate = function(timestamp)
+	{
+		example.deltaTimeMS = timestamp - example.timestampLast;
+		
+		example.volary1.getViews().drawViews();
+		example.volary2.getViews().drawViews();
+		
+		example.frameCount++;
+		example.timestampLast = timestamp;
+		window.requestAnimationFrame(example.onAnimationFrameUpdate);
+	}
 	window.onload = function(e) 
 	{ 
 		
-		volary1 = new Volary.Volary();
+		example.volary1 = new Volary.Volary();
 		{
 			var volaryView1 = new Volary.View();
  			//volaryView1.getBackgroundColor().setR(255);
@@ -21,9 +66,9 @@
 // 			volaryView1.setHeight(100);
 // 			var canvasDocumentElement1 = VolaryView.createDocumentElement(volaryView1.getID());
 // 			volaryView1.attachCanvasDocumentElement(canvasDocumentElement1);
- 			volary1.getViews().addView(volaryView1);
+ 			example.volary1.getViews().addView(volaryView1);
 		}
-		volary2 = new Volary.Volary();
+		example.volary2 = new Volary.Volary();
 		{
 // 			var volaryView2 = new Volary.View();
 // 			volaryView1.constructCanvas(200, 200);			
@@ -35,35 +80,28 @@
 // 			volaryView2.attachCanvasDocumentElement(canvasDocumentElement2);
 // 			volary1.viewsAdd(volaryView2);
 		}
-// 		volary1.viewsDraw();
-	}
-	example.onCreateButtonClick = function()
-	{
-		var volaryView = new Volary.View();
-		//var alpha = 255 - ((32 * volary2.getViews().getViewCount()) % 256);
-		//volaryView.getBackgroundColor().setG(255);
-		//volaryView.getBackgroundColor().setA(alpha);
-		volaryView.getExtent().setX(15);
-		volaryView.getExtent().setY(150);
-		volaryView.constructCanvas();			
-//			volaryView1.setID('canvas2');
-//			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});
-//			var canvasDocumentElement2 = VolaryView.createDocumentElement(volaryView2.getID());
-//			volaryView2.attachCanvasDocumentElement(canvasDocumentElement2);
-		volary2.getViews().addView(volaryView);
-	}
-	example.onDeleteButtonClick = function()
-	{
-		var views = volary2.getViews();
-		var viewCount = views.getViewCount();
-		var view;
-		if(0 < viewCount)
+
+		for(var indexX = 0; indexX < 32; ++indexX)
 		{
-			view = views.getViewByIndex(viewCount-1);
-			views.removeView(view);
-			view.destructCanvas();
+			for(var indexY = 0; indexY < 32; ++indexY)
+			{
+				var pixel = new Volary.Pixel();
+				pixel.getLocation().setX(indexX);
+				pixel.getLocation().setY(indexY);
+				pixel.getColor().setR(indexX * 8);
+				pixel.getColor().setG(indexY * 8);
+				pixel.getColor().setB(indexX * 4 + indexY * 4);
+				pixel.getColor().setA(255);
+				example.volary1.getModels().addModel(pixel);
+				example.volary2.getModels().addModel(pixel);
+			}
 		}
+
+// 		volary1.viewsDraw();
+		window.requestAnimationFrame(example.onAnimationFrameUpdate);
 	}
+
+
 </script>
 </head>
 <body>
@@ -73,7 +111,7 @@
 		<button onclick="example.onDeleteButtonClick()">delete</button>
 	</div>
 	<p id="p1"></p>
-	<canvas id="MyCanvas" width="100" height="150"></canvas>
+	<canvas id="MyCanvas" width="32" height="32"></canvas>
 
 </body>
 </html>

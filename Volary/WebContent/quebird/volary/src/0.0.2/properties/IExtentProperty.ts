@@ -6,6 +6,9 @@ module Volary {
      */
     export interface IExtentProperty
     {
+       /**
+        * Retrieves the extent (width, height, depth).
+        */
        getExtent() : IPosition;
     }
 

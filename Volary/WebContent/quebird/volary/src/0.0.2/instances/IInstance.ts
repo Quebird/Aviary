@@ -7,24 +7,24 @@ module Volary {
         /**
          * Retrieves the creation index of this instance.
          */
-        getInstanceIndex();
+        getInstanceIndex() : number;
         /**
          * Retrieves the type of this.
          */
-        getType();
+        getType() : string;
         /**
          * Retrieves the creation index of this type.
          */
-        getTypeInstanceIndex();
+        getTypeInstanceIndex() : number;
         
         /**
          * Retrieves the id of this.
          */
-        getId(): string;
+        getId() : string;
         /**
          * Sets the id of this.
          */
-        setId(id: string);
+        setId(id: string) : void;
     }
 
 }

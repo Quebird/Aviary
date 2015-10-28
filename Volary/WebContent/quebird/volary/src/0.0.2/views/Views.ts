@@ -1,3 +1,4 @@
+/// <reference path="../IVolary.ts" />
 /// <reference path="AViews.ts" />
 module Volary {
 
@@ -7,10 +8,10 @@ module Volary {
     export class Views extends AViews {
         
         private static viewsInstanceIndex: number = 0;
-        constructor() 
+        constructor(volary? : IVolary) 
         {
             super();
-            this.initInstance("Views", Views.viewsInstanceIndex);
+            this.initInstance("Views", Views.viewsInstanceIndex, volary);
             Views.viewsInstanceIndex++;
         }
     }

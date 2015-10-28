@@ -6,10 +6,13 @@ module Volary {
      */
     export interface ICanvas extends IInstance 
     {
-        createInDocument(caller : IView);
-        attachToDocument(caller : IView, elementId : string);
-        detachFromDocument(caller : IView);
-        deleteFromDocument(caller : IView);
+        createInDocument(caller : IView) : void;
+        attachToDocument(caller : IView, elementId : string) : void;
+        detachFromDocument(caller : IView) : void;
+        deleteFromDocument(caller : IView) : void;
+        
+        drawStart(caller : IView) : ImageData;
+        drawEnd(caller : IView, imageData : ImageData) : void;
     }
 
 }

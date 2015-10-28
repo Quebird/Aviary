@@ -15,7 +15,7 @@ module Volary {
             Volary.volaryInstanceIndex++;
             this.setVersion("0.0.2");
             this.setModels(new Models());
-            this.setViews(new Views());
+            this.setViews(new Views(this));
         }
     }
 }

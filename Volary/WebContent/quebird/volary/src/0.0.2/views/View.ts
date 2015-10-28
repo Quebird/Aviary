@@ -11,7 +11,7 @@ module Volary {
         {
             super();
             this.initInstance("View", View.viewInstanceIndex);
-            this.setCanvas(null);
+            this.setCanvasOrNull(null);
             this.setLocation(new Position());
             this.setExtent(new Position());
             View.viewInstanceIndex++;
