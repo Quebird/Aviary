@@ -17,7 +17,7 @@ module Volary {
         }
         
         private context : CanvasRenderingContext2D;
-        protected getContext() : CanvasRenderingContext2D
+        public getContext() : CanvasRenderingContext2D
         {
             return this.context;
         }
@@ -50,11 +50,14 @@ module Volary {
             var element : HTMLCanvasElement;
             var context : CanvasRenderingContext2D;
             var imageData : ImageData;
+            var imageDataIndex : number;
             {
                 element = document.createElement('canvas');
                 element.id = this.getId();
-                element.width = caller.getExtent().getX();
-                element.height = caller.getExtent().getY();
+//                element.width = caller.getExtent().getX();
+//                element.height = caller.getExtent().getY();
+                element.width = caller.width;
+                element.height = caller.height;
                 document.getElementsByTagName('body') [0].appendChild(element);
                 this.setElement(element);
             }
@@ -63,8 +66,11 @@ module Volary {
                 this.setContext(context);
             }
             {
-                imageData = context.createImageData(caller.getExtent().getX(), caller.getExtent().getY());
+//                imageData = context.createImageData(caller.getExtent().getX(), caller.getExtent().getY());
+                imageData = context.createImageData(caller.width, caller.height);
                 this.setImageData(imageData);
+                this.resetImageData(caller.r, caller.g, caller.b, caller.a);
+
             }
 //            context.fillStyle = caller.getBackgroundColor().getRgbaString();
 //            context.fillRect(0, 0, caller.getWidth(), caller.getHeight());
@@ -75,6 +81,7 @@ module Volary {
             var element : HTMLCanvasElement;
             var context : CanvasRenderingContext2D;
             var imageData : ImageData;
+            var imageDataIndex : number;
             {
                 element = document.getElementById(elementId) as HTMLCanvasElement;
                 this.setId(elementId);
@@ -87,8 +94,10 @@ module Volary {
                 this.setContext(context);
             }
             {
-                imageData = context.createImageData(caller.getExtent().getX(), caller.getExtent().getY());
+                //imageData = context.createImageData(caller.getExtent().getX(), caller.getExtent().getY());
+                imageData = context.createImageData(caller.width, caller.height);
                 this.setImageData(imageData);
+                this.resetImageData(caller.r, caller.g, caller.b, caller.a);
             }
 //            context.fillStyle = caller.getBackgroundColor().getRgbaString();
 //            context.fillRect(0, 0, caller.getWidth(), caller.getHeight());
@@ -106,6 +115,33 @@ module Volary {
             element.parentNode.removeChild(element);
             this.setContext(null);
             this.setElement(null);
+        }
+        
+        public resize(width : number, height : number) : void
+        {
+            var element : HTMLCanvasElement;
+            var imageData : ImageData;
+            var context : CanvasRenderingContext2D;
+            
+            element = document.getElementById(this.getId()) as HTMLCanvasElement;
+            element.width = width;
+            element.height = height;
+            context = this.getContext();
+            imageData = context.createImageData(width, height);
+            this.setImageData(imageData);
+        }
+        
+        public resetImageData(r : number, g : number, b : number, a : number) : void
+        {
+            var imageData = this.getImageData();
+            for(var imageDataIndex = 0; imageDataIndex < imageData.data.length; imageDataIndex += 4)
+            {
+                imageData.data[imageDataIndex + 0] = r;
+                imageData.data[imageDataIndex + 1] = g;
+                imageData.data[imageDataIndex + 2] = b;
+                imageData.data[imageDataIndex + 3] = a;
+            }
+            
         }
         
         public drawStart(caller : IView) : ImageData

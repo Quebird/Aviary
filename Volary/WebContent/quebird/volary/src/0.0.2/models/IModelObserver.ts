@@ -7,6 +7,8 @@ module Volary {
     {
         startObservingModel(model : IModel) : void;
         isObservingModel(model : IModel) : void;
+        notifyObservedModelHide(model : IModel) : void;
+        notifyObservedModelShow(model : IModel) : void;
         stopObservingModel(model : IModel) : void;
     }
 

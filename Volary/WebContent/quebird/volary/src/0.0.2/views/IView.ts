@@ -9,6 +9,9 @@ module Volary {
      */
     export interface IView extends IInstance, ILocationProperty, IExtentProperty, IModelObserver
     {
+        volaryOrNull : IVolary;
+        viewsOrNull : IViews;
+
         /**
          * Constructs a canvas in the DOM.
          */
@@ -30,11 +33,35 @@ module Volary {
          * Draws the view.
          */
         draw() : void;
+
+        x : number;
+        y : number;
+        z : number;
+        changeXyz(color : {x?:number, y?:number, z?:number}) : void;
+        
+        width : number;
+        height : number;
+        depth : number;
+        changeWidthHeightDepth(color : {width?:number, height?:number, depth?:number}) : void;
+
+        r : number;
+        g : number;
+        b : number;
+        a : number;
+        changeRgba(color : {r?:number, g?:number, b?:number, a?:number}) : void;
         
         /**
          * Retrieves number of draw calls this view.
          */
         getDrawCount() : number;
+        
+        pointsAdded : Array<IPoints>;
+        pointsChanged : Array<IPoints>;
+        pointsRemoved : Array<IPoints>;
+        
+        onPointsAdded(caller : IPoints) : void;
+        onPointsChanged(caller : IPoints) : void;
+        onPointsRemoved(caller : IPoints) : void;
         
     }
 

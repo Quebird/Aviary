@@ -14,6 +14,7 @@ module Volary {
         removeView(view : IView) : void;
         
         drawViews() : void;
+        
         getDrawViewsCount() : number;
     }
 

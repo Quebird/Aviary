@@ -6,7 +6,10 @@ module Volary {
      */
     export interface ILocationProperty
     {
-       getLocation() : IPosition;
+       //getLocation() : IPosition;
+       x : number;
+       y : number;
+       z : number;
     }
 
 }

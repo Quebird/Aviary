@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../lib/0.0.1/quebird_volary.js"></script>
+<title>Volary - 2 Pixel lines in 4 Colored Views Alive</title>
+<script type="text/javascript">
+	var volary1 = new Volary();
+	var pixelLineCount = 150;
+	var frameCount = 0;
+	var moveStrategy = 0;
+	var pixel2Move = 0;
+	var delta2MoveX = 0;
+	var delta2MoveY = 0;
+	var depth2Move = 0;
+	var depthMoveUp = true;
+	
+	window.onload = function(e) 
+	{ 
+		var indexX;
+		var indexY;
+		var volaryPixel;
+		{
+			var volaryView1 = new VolaryView();
+			volaryView1.setID('canvas1');
+			volaryView1.setPosition({x:0,y:0});
+			volaryView1.setWidth(100);
+			volaryView1.setHeight(200);
+			volaryView1.setBackgroundColor({r:255,g:255,b:255,a:255});
+			volaryView1.attachCanvasDocumentElement(document.getElementById(volaryView1.getID()));
+			volary1.viewsAdd(volaryView1);
+		}
+		{
+			var volaryView2 = new VolaryView();
+			volaryView2.setID('canvas2');
+			volaryView2.setPosition({x:100,y:0});
+			volaryView2.setWidth(100);
+			volaryView2.setHeight(200);
+			volaryView2.setBackgroundColor({r:200,g:200,b:200,a:255});
+			volaryView2.attachCanvasDocumentElement(document.getElementById(volaryView2.getID()));
+			volary1.viewsAdd(volaryView2);
+		}
+		{
+			var volaryView3 = new VolaryView();
+			volaryView3.setID('canvas3');
+			volaryView3.setPosition({x:0,y:0});
+			volaryView3.setWidth(200);
+			volaryView3.setHeight(100);
+			volaryView3.setBackgroundColor({r:150,g:150,b:150,a:255});
+			volaryView3.attachCanvasDocumentElement(document.getElementById(volaryView3.getID()));
+			volary1.viewsAdd(volaryView3);
+		}
+		{
+			var volaryView4 = new VolaryView();
+			volaryView4.setID('canvas4');
+			volaryView4.setPosition({x:0,y:100});
+			volaryView4.setWidth(200);
+			volaryView4.setHeight(100);
+			volaryView4.setBackgroundColor({r:100,g:100,b:100,a:255});
+			volaryView4.attachCanvasDocumentElement(document.getElementById(volaryView4.getID()));
+			volary1.viewsAdd(volaryView4);
+		}
+		for(indexX = 0; indexX < pixelLineCount; ++indexX)
+		{ // add all pixels
+			for(indexY = 0; indexY < pixelLineCount; ++indexY)
+			{ // add all pixels
+				volaryPixel = new VolaryPixel();
+				volaryPixel.setID('pixel_' + indexX + '_' + indexY);
+				volaryPixel.setPosition({x:(25+1*indexX), y:(25 + 1*indexY)});
+				if(pixelLineCount/2 <= indexX)
+				{
+					volaryPixel.setColor({r:255,g:0,b:0,a:255});
+					volaryPixel.setDepth(0);
+				}
+				else
+				{
+					volaryPixel.setColor({r:0,g:255,b:0,a:255});
+					volaryPixel.setDepth(1);
+				}
+				volary1.modelsAdd(volaryPixel);
+			}
+		}
+		
+	    window.requestAnimationFrame(myAnimationFrameUpdate);
+	}
+	myAnimationFrameUpdate = function(timestamp)
+	{
+		volary1.modelsChangesStart();
+		
+		pixel2Move = frameCount % 20;
+		if(pixel2Move == 0)
+		{ // move 1 pixel each frame
+			switch(moveStrategy)
+			{
+				case 0:
+				{
+					delta2MoveX = -1;
+					delta2MoveY = -1;
+					moveStrategy = 1;
+				}
+				break;
+				case 1:
+				{
+					delta2MoveX = 0;
+					delta2MoveY = 0;
+					moveStrategy = 2;
+				}
+				break;
+				case 2:
+				{
+					if(depthMoveUp)
+					{
+						depth2Move = -1;
+						depthMoveUp = false;
+					}
+					else
+					{
+						depth2Move = -1;
+						depthMoveUp = true;
+					}
+					delta2MoveX = 1;
+					delta2MoveY = 1;
+					moveStrategy = 3;
+				}
+				break;
+				case 3:
+				{
+					delta2MoveX = 0;
+					delta2MoveY = 0;
+					moveStrategy = 0;
+				}
+				break;
+			}
+		}
+		
+		var indexX;
+		var indexY;
+		var volaryPixel;
+		var pos = {x : undefined, y : undefined};
+		var sign = 1;
+		for(indexX = 0; indexX < pixelLineCount; ++indexX)
+		{ // add all pixels
+			for(indexY = 0; indexY < pixelLineCount; ++indexY)
+			{ // add all pixels
+				volaryPixel = volary1.models[indexX + indexY*pixelLineCount];
+				if(pixelLineCount/2 <= indexX)
+				{
+					pos = volaryPixel.getPosition(pos);
+					pos.x += sign * delta2MoveX;
+					pos.y += sign * delta2MoveY;
+					volaryPixel.setDepth(depth2Move);
+					volaryPixel.setPosition(pos);
+				}
+	//			volaryPixel.setX(volaryPixel.getX() + delta2MoveX);
+	//			volaryPixel.setY(volaryPixel.getY() + delta2MoveY);
+			}
+		}
+		
+		volary1.modelsChangesEnd();
+		
+		volary1.viewsDraw();
+		window.requestAnimationFrame(myAnimationFrameUpdate);
+		frameCount++;
+	}
+</script>
+</head>
+<body >
+
+<div style="font-size: 0;">
+	<canvas id="canvas1"></canvas>
+	<canvas id="canvas2"></canvas>
+	<br>
+	<canvas id="canvas3"></canvas>
+	<br>
+	<canvas id="canvas4"></canvas>
+</div>
+
+
+</body>
+</html>

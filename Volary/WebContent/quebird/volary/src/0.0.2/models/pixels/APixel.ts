@@ -8,7 +8,7 @@ module Volary {
      */
     export abstract class APixel extends AModel implements IPixel {
         
-        private location : IPosition;
+/*        private location : IPosition;
         public getLocation() : IPosition
         {
             return this.location;
@@ -17,8 +17,12 @@ module Volary {
         {
             this.location = location;
         }
-        
-        private color : IColor;
+*/
+        public x : number;
+        public y : number;
+        public z : number;
+                
+/*        private color : IColor;
         public getColor() : IColor
         {
             return this.color;
@@ -27,7 +31,12 @@ module Volary {
         {
             this.color = color;
         }
-        
+*/
+        public r : number;        
+        public g : number;        
+        public b : number;        
+        public a : number;        
+
         constructor() 
         {
             super();

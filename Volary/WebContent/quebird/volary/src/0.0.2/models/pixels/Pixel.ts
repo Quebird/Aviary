@@ -12,8 +12,17 @@ module Volary {
         {
             super();
             this.initInstance("Pixel", Pixel.pixelInstanceIndex);
-            this.setLocation(new Position());
-            this.setColor(new Color());
+            //this.setLocation(new Position());
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            //this.setColor(new Color());
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+            this.a = 0;
+            this.frameModified = 0;
+            this.modelsOrNull = null;
             Pixel.pixelInstanceIndex++;
         }
     }

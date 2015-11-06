@@ -65,15 +65,20 @@ module Volary {
         {
             var volary : IVolary = this.getVolary();
             this.getViews().push(view);
-            volary.getModels().addModelObserver(view);
+            view.volaryOrNull = volary;
+            view.viewsOrNull = this;
+            //volary.getModels().addModelObserver(view);
+            //volary.worlds.
         }
         public removeView(view : IView) : void
         {
             var volary : IVolary = this.getVolary();
             var views : Array<IView> = this.getViews();
             var index = views.indexOf(view);
-            volary.getModels().removeModelObserver(view);
+            //volary.getModels().removeModelObserver(view);
             views.splice(index, 1);
+            view.viewsOrNull = null;
+            view.volaryOrNull = null;
         }
         
         public drawViews() : void
@@ -81,7 +86,7 @@ module Volary {
             var views : Array<IView> = this.getViews();
             var index = 0;
             var view : IView;
-            var drawViewsCount : number = this.getDrawViewsCount();
+            var drawViewsCount : number = this.drawViewsCount;// this.getDrawViewsCount();
             for(index = 0; index < views.length; ++index)
             {
                 view = views[index];
@@ -89,7 +94,7 @@ module Volary {
             }
             {
                 ++drawViewsCount;
-                this.setDrawViewsCount(drawViewsCount);
+                this.drawViewsCount = drawViewsCount;//this.setDrawViewsCount(drawViewsCount);
             }
         }
 

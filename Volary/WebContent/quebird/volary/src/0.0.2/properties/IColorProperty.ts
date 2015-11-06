@@ -6,7 +6,11 @@ module Volary {
      */
     export interface IColorProperty
     {
-       getColor() : IColor;
+       //getColor() : IColor;
+        r : number;
+        g : number;
+        b : number;
+        a : number;
     }
 
 }

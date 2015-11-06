@@ -9,7 +9,10 @@ module Volary {
        /**
         * Retrieves the extent (width, height, depth).
         */
-       getExtent() : IPosition;
+       //getExtent() : IPosition;
+       width : number;
+       height : number;
+       depth : number;
     }
 
 }

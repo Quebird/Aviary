@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+html, body 
+{
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	border: 0;
+	overflow: hidden; /*  Disable scrollbars */
+	display: block;  /* No floating content on sides */
+}
+</style>
+
+<title>Volary - 2 Worlds and 1 View</title>
+<script type="text/javascript" src="../../lib/0.0.2/quebird.volary.0.0.2.js"></script>
+<script type="text/javascript">
+
+	var example = 
+	{
+		volary1 : undefined,
+		world1Points : [],
+		world2Points : [],
+		play : true
+	};
+	example.createView = function()
+	{
+		var volaryView1 = new Volary.View();
+		{
+			volaryView1.width = window.innerWidth;
+			volaryView1.height = (100 * window.innerHeight) / 75;
+			volaryView1.r = 128;
+			volaryView1.g = 128;
+			volaryView1.b = 128;
+			volaryView1.a = 128;
+			//volaryView1.attachCanvas('MyCanvas');		
+			volaryView1.constructCanvas();
+ 			example.volary1.getViews().addView(volaryView1);
+		}
+		return volaryView1;
+	}
+	example.deleteView = function()
+	{
+		var volaryView1 = example.volary1.getViews().getViewByIndex(0);
+		{
+ 			example.volary1.getViews().removeView(volaryView1);
+			volaryView1.destructCanvas();
+		}
+	}
+	example.createWorld1 = function()
+	{
+		var world = example.volary1.worlds.createWorld(25, 75, 0, 256, 128, 1);
+		for(var indexY = 0; indexY < world.height; ++indexY)
+		{
+			for(var indexX = 0; indexX < world.width; ++indexX)
+			{
+				var point1 = new Volary.Point();
+				point1.x = world.x + indexX;
+				point1.y = world.y + indexY;
+				point1.r = (255 * indexX) / world.width;
+				point1.g = (255 * indexY) / world.height;
+				point1.b = 255 - (((255 * indexX) / world.width) + ((255 * indexY) / world.height)) / 2;
+				point1.a = 0;
+				world.addPoint(point1);
+				example.world1Points.push(point1);
+			}
+		}
+		return world;
+	}
+	example.deleteWorld1 = function()
+	{
+	}
+	example.createWorld2 = function()
+	{
+		var world = example.volary1.worlds.createWorld(500, 25, 0, 128, 256, 1);
+		for(var indexY = 0; indexY < world.height; ++indexY)
+		{
+			for(var indexX = 0; indexX < world.width; ++indexX)
+			{
+				var point1 = new Volary.Point();
+				point1.x = world.x + indexX;
+				point1.y = world.y + indexY;
+				point1.r = (255 * indexX) / world.width;
+				point1.g = (255 * indexY) / world.height;
+				point1.b = 255 - (((255 * indexX) / world.width) + ((255 * indexY) / world.height)) / 2;
+				point1.a = 0;
+				world.addPoint(point1);
+				example.world2Points.push(point1);
+			}
+		}
+		return world;
+	}
+	example.deleteWorld2 = function()
+	{
+	}
+
+	example.onPausePlayButtonClick = function()
+	{
+		example.play = !example.play;
+	}
+	example.onViewBackgroundRChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_r_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: value, g:view.g, b:view.b, a: view.a});
+	}
+	example.onViewBackgroundGChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_g_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: view.r, g:value, b:view.b, a: view.a});
+	}
+	example.onViewBackgroundBChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_b_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: view.r, g:view.g, b:value, a: view.a});
+	}
+	example.onViewBackgroundAChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_a_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: view.r, g:view.g, b:view.b, a:value});
+	}
+	example.onViewXChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_x_slider = document.getElementById('view_x_slider');
+		var xValue = parseInt(view_x_slider.value);
+		view.changeXyz({x: xValue, y:view.y, z:view.z});
+	}
+	example.onViewYChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_y_slider = document.getElementById('view_y_slider');
+		var yValue = parseInt(view_y_slider.value);
+		view.changeXyz({x: view.x, y:yValue, z:view.z});
+	}
+	example.onViewWidthChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_width_slider = document.getElementById('view_width_slider');
+		var widthValue = parseInt(view_width_slider.value);
+		view.changeWidthHeightDepth({width: widthValue, height:view.height, depth:view.depth});
+	}
+	example.onViewHeightChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_height_slider = document.getElementById('view_height_slider');
+		var heightValue = parseInt(view_height_slider.value);
+		view.changeWidthHeightDepth({width: view.width, height:heightValue, depth:view.depth});
+	}
+	example.onResizeView = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var width = window.innerWidth;
+		var view_width_slider = document.getElementById('view_width_slider');
+		view_width_slider.value = width;
+		view_width_slider.max = 1.5 * window.innerWidth;
+		var height = (80 * window.innerHeight) / 100;
+		var view_height_slider = document.getElementById('view_height_slider');
+		view_height_slider.value = height;
+		view_height_slider.max = 1.5 * window.innerHeight;
+		view.changeWidthHeightDepth({width: width, height: height, depth:view.depth});
+	}
+	example.onAnimationFrameUpdate = function(timestampMS)
+	{
+		var index;
+		var length;
+		var currentFrame;
+		var currentViewLongestSide;
+		var point;
+
+		example.deltaTimeMS = timestampMS - example.timestampLast;
+		
+		example.volary1.beginFrame(timestampMS);
+		
+		if(example.play)
+		{
+			currentFrame = example.volary1.currentFrame;
+			if(0 < example.volary1.getViews().getViewCount())
+			{
+				if(0 < example.volary1.worlds.worlds.length)
+				{
+					currentViewLongestSide = example.volary1.worlds.worlds[0].width;
+					count = example.world1Points.length;
+					for(index = 0; index < count; ++index)
+					{
+						point = example.world1Points[index];
+//						point.changeA(255 - (currentFrame + (index % currentViewLongestSide)) % 256);
+						point.changeA(currentFrame % 256);
+					}
+				}
+
+				if(1 < example.volary1.worlds.worlds.length)
+				{
+					currentViewLongestSide = example.volary1.worlds.worlds[1].width;
+					count = example.world2Points.length;
+					for(index = 0; index < count; ++index)
+					{
+						point = example.world2Points[index];
+						//point.changeA((currentFrame + (index % currentViewLongestSide)) % 256);
+						point.changeA(255 - currentFrame % 256);
+					}
+				}
+
+			}
+		}
+		example.volary1.getViews().drawViews();
+		
+		example.volary1.endFrame();
+		
+		window.requestAnimationFrame(example.onAnimationFrameUpdate); // apparently needs to be first
+	}
+	window.onload = function(e) 
+	{ 
+		example.volary1 = new Volary.Volary();
+		var volaryWorld1 = example.createWorld1();
+		var volaryWorld2 = example.createWorld2();
+		var volaryView1 = example.createView();
+		example.onResizeView();
+		volaryWorld1.addObserver(volaryView1);
+		volaryWorld2.addObserver(volaryView1);
+		window.requestAnimationFrame(example.onAnimationFrameUpdate);
+	}
+
+</script>
+</head>
+<body onresize='example.onResizeView()' bgcolor='white'>
+
+	 
+	<button id="animate_toggle_button" title="toggle animation" 
+		onclick='example.onPausePlayButtonClick()'>Play/Pause</button>
+		
+	<input id="view_bgcolor_r_slider" title="view background red" type="range" min="0" value="128" max="255"
+		onchange='example.onViewBackgroundRChange()'>
+	<input id="view_bgcolor_g_slider" title="view background green" type="range" min="0" value="128" max="255"
+		onchange='example.onViewBackgroundGChange()'>
+	<input id="view_bgcolor_b_slider" title="view background blue" type="range" min="0" value="128" max="255"
+		onchange='example.onViewBackgroundBChange()'>
+	<input id="view_bgcolor_a_slider" title="view background alpha" type="range" min="0" value="128" max="255"
+		onchange='example.onViewBackgroundAChange()'>
+	
+	<input id="view_x_slider" title="view x" type="range" min="-500" value="0" max="500"
+		onchange='example.onViewXChange()'>
+	<input id="view_y_slider" title="view y" type="range" min="-500" value="0" max="500"
+		onchange='example.onViewYChange()'>
+		
+	<input id="view_width_slider" title="view width" type="range" min="0" value="800" max="1600"
+		onchange='example.onViewWidthChange()'>
+	<input id="view_height_slider" title="view height" type="range" min="0" value="600" max="1200"
+		onchange='example.onViewHeightChange()'>
+	<hr>
+	 
+	<!-- <canvas id='MyCanvas' width='1000' height='512'></canvas>  -->
+
+</body>
+</html>

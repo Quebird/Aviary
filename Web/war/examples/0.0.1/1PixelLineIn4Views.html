@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../lib/0.0.1/quebird_volary.js"></script>
+<title>Volary - 1 Pixel line in 4 Views</title>
+<script type="text/javascript">
+	window.onload = function(e) 
+	{ 
+		var volary1 = new Volary();
+		var index;
+		var volaryPixel;
+		{
+			var volaryView1 = new VolaryView();
+			volaryView1.setID('canvas1');
+			volaryView1.setPosition({x:0,y:0});
+			volaryView1.setWidth(100);
+			volaryView1.setHeight(200);
+			volaryView1.setBackgroundColor({r:255,g:0,b:0,a:255});
+			volaryView1.attachCanvasDocumentElement(document.getElementById(volaryView1.getID()));
+			volary1.viewsAdd(volaryView1);
+		}
+		{
+			var volaryView2 = new VolaryView();
+			volaryView2.setID('canvas2');
+			volaryView2.setPosition({x:100,y:0});
+			volaryView2.setWidth(100);
+			volaryView2.setHeight(200);
+			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});
+			volaryView2.attachCanvasDocumentElement(document.getElementById(volaryView2.getID()));
+			volary1.viewsAdd(volaryView2);
+		}
+		{
+			var volaryView3 = new VolaryView();
+			volaryView3.setID('canvas3');
+			volaryView3.setPosition({x:0,y:0});
+			volaryView3.setWidth(200);
+			volaryView3.setHeight(100);
+			volaryView3.setBackgroundColor({r:255,g:0,b:0,a:255});
+			volaryView3.attachCanvasDocumentElement(document.getElementById(volaryView3.getID()));
+			volary1.viewsAdd(volaryView3);
+		}
+		{
+			var volaryView4 = new VolaryView();
+			volaryView4.setID('canvas4');
+			volaryView4.setPosition({x:0,y:100});
+			volaryView4.setWidth(200);
+			volaryView4.setHeight(100);
+			volaryView4.setBackgroundColor({r:0,g:255,b:0,a:255});
+			volaryView4.attachCanvasDocumentElement(document.getElementById(volaryView4.getID()));
+			volary1.viewsAdd(volaryView4);
+		}
+		for(index = 0; index < 15; ++index)
+		{
+			volaryPixel = new VolaryPixel();
+			volaryPixel.setID('pixel' + index);
+			volaryPixel.setPosition({x:(25+10*index), y:(25 + 10*index)});
+			volaryPixel.setColor({r:0,g:0,b:0,a:255});
+			volary1.modelsAdd(volaryPixel);
+		}
+		volary1.viewsDraw();
+	}
+</script>
+</head>
+<body >
+
+<div style="font-size: 0;">
+	<canvas id="canvas1"></canvas>
+	<canvas id="canvas2"></canvas>
+	<br>
+	<canvas id="canvas3"></canvas>
+	<br>
+	<canvas id="canvas4"></canvas>
+</div>
+
+
+</body>
+</html>

@@ -11,9 +11,24 @@ module Volary {
         {
             super();
             this.initInstance("View", View.viewInstanceIndex);
+            this.volaryOrNull = null;
+            this.viewsOrNull = null;
             this.setCanvasOrNull(null);
-            this.setLocation(new Position());
-            this.setExtent(new Position());
+            //this.setLocation(new Position());
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+            this.a = 0;
+            
+            //this.setExtent(new Position());
+            this.width = 0;
+            this.height = 0;
+            this.depth = 0;
+            this.pointsChanged = new Array<IPoints>();
+            this.pointsRemoved = new Array<IPoints>();
             View.viewInstanceIndex++;
         }
     }

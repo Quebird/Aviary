@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script type="text/javascript" src="../../lib/0.0.1/quebird_volary.js"></script>
+<title>Volary - 2 Views</title>
+<script type="text/javascript">
+	window.onload = function(e) 
+	{ 
+		var volary1 = new Volary();
+		{
+			var volaryView1 = new VolaryView();
+			volaryView1.setID('canvas1');
+			volaryView1.setWidth(200);
+			volaryView1.setHeight(100);
+			volaryView1.setBackgroundColor({r:255,g:0,b:0,a:255});
+			var canvasDocumentElement1 = VolaryView.createDocumentElement(volaryView1.getID());
+			volaryView1.attachCanvasDocumentElement(canvasDocumentElement1);
+			volary1.viewsAdd(volaryView1);
+		}
+		{
+			var volaryView2 = new VolaryView();
+			volaryView1.setID('canvas2');
+			volaryView2.setWidth(200);
+			volaryView2.setHeight(100);
+			volaryView2.setBackgroundColor({r:0,g:255,b:0,a:255});
+			var canvasDocumentElement2 = VolaryView.createDocumentElement(volaryView2.getID());
+			volaryView2.attachCanvasDocumentElement(canvasDocumentElement2);
+			volary1.viewsAdd(volaryView2);
+		}
+		volary1.viewsDraw();
+	}
+</script>
+</head>
+<body>
+
+<p id="p1"></p>
+
+</body>
+</html>
