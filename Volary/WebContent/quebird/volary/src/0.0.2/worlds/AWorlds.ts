@@ -27,6 +27,23 @@ module Volary {
             this.addWorld(world);
             return world;
         }
+        public getWorldByInstanceId(id : string) : IWorld
+        {
+            var worldOrNull : IWorld = null;
+            
+            for(var index = 0; index < this.worlds.length; ++index)
+            {
+                var world : IWorld = this.worlds[index];
+                if(world.getId().valueOf() == id.valueOf())
+                {
+                    worldOrNull = world;
+                    break;
+                }
+            }
+            
+            return worldOrNull;
+        }
+
         public deleteWorld(world : IWorld) : void
         {
             this.removeWorld(world);
@@ -41,6 +58,7 @@ module Volary {
             var index = this.worlds.indexOf(world);
             this.worlds.splice(index, 1);
         }
+        
 
     }
 }

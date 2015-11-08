@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+html, body 
+{
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	border: 0;
+	overflow: hidden; /*  Disable scrollbars */
+	display: block;  /* No floating content on sides */
+}
+</style>
+
+<title>Volary - 3 Worlds and 1 View</title>
+<script type="text/javascript" src="../../lib/0.0.2/quebird.volary.0.0.2.js"></script>
+<script type="text/javascript">
+
+	var example = 
+	{
+		volary1 : undefined,
+		world1Points : [],
+		world2Points : [],
+		world3Points : [],
+		play : true
+	};
+	example.createView = function()
+	{
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(!view)
+		{
+			view = new Volary.View();
+			{
+				view.setId('view#1');
+				view.width = window.innerWidth;
+				view.height = Math.floor((75 * window.innerHeight) / 100);
+				view.r = 0;
+				view.g = 0;
+				view.b = 0;
+				view.a = 255;
+				//volaryView1.attachCanvas('MyCanvas');		
+				view.constructCanvas();
+	 			example.volary1.getViews().addView(view);
+			}
+		}
+
+		return view;
+	}
+	example.deleteView = function()
+	{
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(view)
+		{
+ 			example.volary1.getViews().removeView(view);
+ 			view.destructCanvas();
+		}
+	}
+	example.onCreateWorld1ButtonClick = function()
+	{
+		var world = example.volary1.worlds.getWorldByInstanceId('world#1');
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(!world)
+		{
+			var world = example.volary1.worlds.createWorld(
+				Math.floor((30 * view.width) / 100), 
+				Math.floor((25 * view.height) / 100), 
+				0, 
+				Math.floor((20 * view.width) / 100), 
+				Math.floor((10 * view.height) / 100), 
+				1);
+			world.setId('world#1');
+			for(var indexY = 0; indexY < world.height; ++indexY)
+			{
+				for(var indexX = 0; indexX < world.width; ++indexX)
+				{
+					var point1 = new Volary.Point();
+					point1.x = world.x + indexX;
+					point1.y = world.y + indexY;
+					point1.r = (255 * indexX) / world.width;
+					point1.g = (255 * indexY) / world.height;
+					point1.b = 255 - (((255 * indexX) / world.width) + ((255 * indexY) / world.height)) / 2;
+					point1.a = 0;
+					world.addPoint(point1);
+					example.world1Points.push(point1);
+				}
+			}
+			world.addObserver(view);
+		}
+
+		return world;
+	}
+	example.onDeleteWorld1ButtonClick = function()
+	{
+		var world = example.volary1.worlds.getWorldByInstanceId('world#1');
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(world)
+		{
+			world.removeObserver(view);
+			example.world1Points = [];
+			example.volary1.worlds.deleteWorld(world);
+		}
+	}
+	example.onCreateWorld2ButtonClick = function()
+	{
+		var world = example.volary1.worlds.getWorldByInstanceId('world#2');
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(!world)
+		{
+			var world = example.volary1.worlds.createWorld(
+				Math.floor((60 * view.width) / 100), 
+				Math.floor((20 * view.height) / 100), 
+				0, 
+				Math.floor((10 * view.width) / 100), 
+				Math.floor((20 * view.height) / 100), 
+				1);
+			world.setId('world#2');
+			for(var indexY = 0; indexY < world.height; ++indexY)
+			{
+				for(var indexX = 0; indexX < world.width; ++indexX)
+				{
+					var point1 = new Volary.Point();
+					point1.x = world.x + indexX;
+					point1.y = world.y + indexY;
+					point1.r = (255 * indexX) / world.width;
+					point1.g = (255 * indexY) / world.height;
+					point1.b = 255 - (((255 * indexX) / world.width) + ((255 * indexY) / world.height)) / 2;
+					point1.a = 0;
+					world.addPoint(point1);
+					example.world2Points.push(point1);
+				}
+			}
+			world.addObserver(view);
+		}
+		return world;
+	}
+	example.onDeleteWorld2ButtonClick = function()
+	{
+		var world = example.volary1.worlds.getWorldByInstanceId('world#2');
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(world)
+		{
+			world.removeObserver(view);
+			example.world2Points = [];
+			example.volary1.worlds.deleteWorld(world);
+		}
+	}
+	example.onCreateWorld3ButtonClick = function()
+	{
+		var world = example.volary1.worlds.getWorldByInstanceId('world#3');
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(!world)
+		{
+			var world = example.volary1.worlds.createWorld(
+				Math.floor((25 * view.width) / 100), 
+				Math.floor((60 * view.height) / 100), 
+				0, 
+				Math.floor((50 * view.width) / 100), 
+				Math.floor((5 * view.height) / 100), 
+				1);
+			world.setId('world#3');
+			for(var indexY = 0; indexY < world.height; ++indexY)
+			{
+				for(var indexX = 0; indexX < world.width; ++indexX)
+				{
+					var point1 = new Volary.Point();
+					point1.x = world.x + indexX;
+					point1.y = world.y + indexY;
+					point1.r = (255 * indexX) / world.width;
+					point1.g = (255 * indexY) / world.height;
+					point1.b = 255 - (((255 * indexX) / world.width) + ((255 * indexY) / world.height)) / 2;
+					point1.a = 0;
+					world.addPoint(point1);
+					example.world3Points.push(point1);
+				}
+			}
+			world.addObserver(view);
+		}
+		return world;
+	}
+	example.onDeleteWorld3ButtonClick = function()
+	{
+		var world = example.volary1.worlds.getWorldByInstanceId('world#3');
+		var view = example.volary1.getViews().getViewByInstanceId('view#1');
+		if(world)
+		{
+			world.removeObserver(view);
+			example.world3Points = [];
+			example.volary1.worlds.deleteWorld(world);
+		}
+	}
+	example.onPausePlayButtonClick = function()
+	{
+		example.play = !example.play;
+	}
+	example.onViewBackgroundRChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_r_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: value, g:view.g, b:view.b, a: view.a});
+	}
+	example.onViewBackgroundGChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_g_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: view.r, g:value, b:view.b, a: view.a});
+	}
+	example.onViewBackgroundBChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_b_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: view.r, g:view.g, b:value, a: view.a});
+	}
+	example.onViewBackgroundAChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var slider = document.getElementById('view_bgcolor_a_slider');
+		var value = parseInt(slider.value);
+		view.changeRgba({r: view.r, g:view.g, b:view.b, a:value});
+	}
+	example.onViewXChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_x_slider = document.getElementById('view_x_slider');
+		var xValue = parseInt(view_x_slider.value);
+		view.changeXyz({x: xValue, y:view.y, z:view.z});
+	}
+	example.onViewYChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_y_slider = document.getElementById('view_y_slider');
+		var yValue = parseInt(view_y_slider.value);
+		view.changeXyz({x: view.x, y:yValue, z:view.z});
+	}
+	example.onViewWidthChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_width_slider = document.getElementById('view_width_slider');
+		var widthValue = parseInt(view_width_slider.value);
+		view.changeWidthHeightDepth({width: widthValue, height:view.height, depth:view.depth});
+	}
+	example.onViewHeightChange = function()
+	{
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var view_height_slider = document.getElementById('view_height_slider');
+		var heightValue = parseInt(view_height_slider.value);
+		view.changeWidthHeightDepth({width: view.width, height:heightValue, depth:view.depth});
+	}
+	example.onResizeView = function()
+	{
+		example.onDeleteWorld3ButtonClick();
+		example.onDeleteWorld2ButtonClick();
+		example.onDeleteWorld1ButtonClick();
+		var view = example.volary1.getViews().getViewByIndex(0);
+		var width = window.innerWidth;
+		var view_width_slider = document.getElementById('view_width_slider');
+		view_width_slider.value = width;
+		view_width_slider.max = 1.5 * window.innerWidth;
+		var height = (75 * window.innerHeight) / 100;
+		var view_height_slider = document.getElementById('view_height_slider');
+		view_height_slider.value = height;
+		view_height_slider.max = 1.5 * window.innerHeight;
+		view.changeWidthHeightDepth({width: width, height: height, depth:view.depth});
+		example.onCreateWorld1ButtonClick();
+		example.onCreateWorld2ButtonClick();
+		example.onCreateWorld3ButtonClick();
+	}
+	example.onAnimationFrameUpdate = function(timestampMS)
+	{
+		var index;
+		var length;
+		var currentFrame;
+		var currentViewLongestSide;
+		var point;
+
+		window.requestAnimationFrame(example.onAnimationFrameUpdate); // apparently needs to be first, maybe to get steady 60 FPS?
+
+		example.deltaTimeMS = timestampMS - example.timestampLast;
+		
+		example.volary1.beginFrame(timestampMS);
+		
+		if(example.play)
+		{
+			currentFrame = example.volary1.currentFrame;
+			if(0 < example.volary1.getViews().getViewCount())
+			{
+				var world = example.volary1.worlds.getWorldByInstanceId('world#1');
+				if(world)
+				{
+					currentViewLongestSide = world.width;
+					count = example.world1Points.length;
+					for(index = 0; index < count; ++index)
+					{
+						point = example.world1Points[index];
+//						point.changeA(255 - (currentFrame + (index % currentViewLongestSide)) % 256);
+						var a = 255 - (255 * ((currentFrame) % (currentViewLongestSide / 2))) / (currentViewLongestSide / 2);
+						point.changeA(a);
+					}
+				}
+
+				var world = example.volary1.worlds.getWorldByInstanceId('world#2');
+				if(world)
+				{
+					currentViewLongestSide = world.width;
+					count = example.world2Points.length;
+					for(index = 0; index < count; ++index)
+					{
+						point = example.world2Points[index];
+						//point.changeA((currentFrame + (index % currentViewLongestSide)) % 256);
+						var a = 255 - (255 * ((currentFrame + index) % (currentViewLongestSide))) / (currentViewLongestSide);
+						point.changeA(a);
+					}
+				}
+
+				var world = example.volary1.worlds.getWorldByInstanceId('world#3');
+				if(world)
+				{
+					currentViewLongestSide = world.width;
+					count = example.world3Points.length;
+					for(index = 0; index < count; ++index)
+					{
+						point = example.world3Points[index];
+						//point.changeA((currentFrame + (index % currentViewLongestSide)) % 256);
+						var a = (255 * ((-currentFrame + index) % (currentViewLongestSide / 10))) / (currentViewLongestSide / 10);
+						point.changeA(a);
+					}
+				}
+
+			}
+		}
+		example.volary1.getViews().drawViews();
+		
+		example.volary1.endFrame();
+		
+	}
+	window.onload = function(e) 
+	{ 
+		example.volary1 = new Volary.Volary();
+		var volaryView1 = example.createView();
+		example.onResizeView();
+		window.requestAnimationFrame(example.onAnimationFrameUpdate);
+	}
+
+</script>
+</head>
+<body onresize='example.onResizeView()' bgcolor='white'>
+
+	 
+	<button id="animate_toggle_button" title="toggle animation" 
+		onclick='example.onPausePlayButtonClick()'>Play/Pause</button>
+		
+	<input id="view_bgcolor_r_slider" title="view background red" type="range" min="0" value="0" max="255"
+		onchange='example.onViewBackgroundRChange()'>
+	<input id="view_bgcolor_g_slider" title="view background green" type="range" min="0" value="0" max="255"
+		onchange='example.onViewBackgroundGChange()'>
+	<input id="view_bgcolor_b_slider" title="view background blue" type="range" min="0" value="0" max="255"
+		onchange='example.onViewBackgroundBChange()'>
+	<input id="view_bgcolor_a_slider" title="view background alpha" type="range" min="0" value="255" max="255"
+		onchange='example.onViewBackgroundAChange()'>
+	
+	<input id="view_x_slider" title="view x" type="range" min="-500" value="0" max="500"
+		onchange='example.onViewXChange()'>
+	<input id="view_y_slider" title="view y" type="range" min="-500" value="0" max="500"
+		onchange='example.onViewYChange()'>
+		
+	<input id="view_width_slider" title="view width" type="range" min="0" value="800" max="1600"
+		onchange='example.onViewWidthChange()'>
+	<input id="view_height_slider" title="view height" type="range" min="0" value="600" max="1200"
+		onchange='example.onViewHeightChange()'>
+	<hr>
+	<button id="create_world1_button" title="create world 1" 
+		onclick='example.onCreateWorld1ButtonClick()'>Create World 1</button>
+	<button id="delete_world1_button" title="delete world 1" 
+		onclick='example.onDeleteWorld1ButtonClick()'>Delete World 1</button>
+	<button id="create_world2_button" title="create world 2" 
+		onclick='example.onCreateWorld2ButtonClick()'>Create World 2</button>
+	<button id="delete_world2_button" title="delete world 2" 
+		onclick='example.onDeleteWorld2ButtonClick()'>Delete World 2</button>
+	<button id="create_world3_button" title="create world 3" 
+		onclick='example.onCreateWorld3ButtonClick()'>Create World 3</button>
+	<button id="delete_world3_button" title="delete world 3" 
+		onclick='example.onDeleteWorld3ButtonClick()'>Delete World 3</button>
+	<hr>
+	 
+	<!-- <canvas id='MyCanvas' width='1000' height='512'></canvas>  -->
+
+</body>
+</html>

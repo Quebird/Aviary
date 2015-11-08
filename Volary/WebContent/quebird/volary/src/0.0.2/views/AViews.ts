@@ -70,6 +70,22 @@ module Volary {
             //volary.getModels().addModelObserver(view);
             //volary.worlds.
         }
+        public getViewByInstanceId(id : string) : IView
+        {
+            var viewOrNull : IView = null;
+            
+            for(var index = 0; index < this.views.length; ++index)
+            {
+                var view : IView = this.views[index];
+                if(view.getId().valueOf() == id.valueOf())
+                {
+                    viewOrNull = view;
+                    break;
+                }
+            }
+            
+            return viewOrNull;
+        }
         public removeView(view : IView) : void
         {
             var volary : IVolary = this.getVolary();

@@ -9,6 +9,7 @@ module Volary {
          
         getViewCount() : number;
         getViewByIndex(index : number) : IView;
+        getViewByInstanceId(id : string) : IView;
 
         addView(view : IView) : void;
         removeView(view : IView) : void;

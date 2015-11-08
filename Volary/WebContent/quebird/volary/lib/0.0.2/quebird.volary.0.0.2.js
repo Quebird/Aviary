@@ -1,5 +1,4 @@
 /// <reference path="../IInstance.ts" />
-/// <reference path="../instances/positions/IPosition.ts" />
 var Volary;
 (function (Volary) {
     /**
@@ -58,175 +57,143 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-/// <reference path="../IVolary.ts" />
-/// <reference path="../instances/AInstance.ts" />
-/// <reference path="../models/IModels.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract view container implementation.
-     */
-    var AViews = (function (_super) {
-        __extends(AViews, _super);
-        function AViews() {
-            _super.call(this);
-            this.views = new Array();
-            this.drawViewsCount = 0;
-        }
-        AViews.prototype.getVolary = function () {
-            return this.volary;
-        };
-        AViews.prototype.setVolary = function (volary) {
-            this.volary = volary;
-        };
-        AViews.prototype.getViews = function () {
-            return this.views;
-        };
-        AViews.prototype.setViews = function (views) {
-            this.views = views;
-        };
-        AViews.prototype.getDrawViewsCount = function () {
-            return this.drawViewsCount;
-        };
-        AViews.prototype.setDrawViewsCount = function (drawViewsCount) {
-            this.drawViewsCount = drawViewsCount;
-        };
-        AViews.prototype.initInstance = function (type, typeInstanceIndex, volary) {
-            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
-            if (volary) {
-                this.setVolary(volary);
-            }
-        };
-        AViews.prototype.getViewCount = function () {
-            return this.getViews().length;
-        };
-        AViews.prototype.getViewByIndex = function (index) {
-            var view = this.getViews()[index];
-            return view;
-        };
-        AViews.prototype.addView = function (view) {
-            var volary = this.getVolary();
-            this.getViews().push(view);
-            view.volaryOrNull = volary;
-            view.viewsOrNull = this;
-            //volary.getModels().addModelObserver(view);
-            //volary.worlds.
-        };
-        AViews.prototype.removeView = function (view) {
-            var volary = this.getVolary();
-            var views = this.getViews();
-            var index = views.indexOf(view);
-            //volary.getModels().removeModelObserver(view);
-            views.splice(index, 1);
-            view.viewsOrNull = null;
-            view.volaryOrNull = null;
-        };
-        AViews.prototype.drawViews = function () {
-            var views = this.getViews();
-            var index = 0;
-            var view;
-            var drawViewsCount = this.drawViewsCount; // this.getDrawViewsCount();
-            for (index = 0; index < views.length; ++index) {
-                view = views[index];
-                view.draw();
-            }
-            {
-                ++drawViewsCount;
-                this.drawViewsCount = drawViewsCount; //this.setDrawViewsCount(drawViewsCount);
-            }
-        };
-        return AViews;
-    })(Volary.AInstance);
-    Volary.AViews = AViews;
-})(Volary || (Volary = {}));
-/// <reference path="../IVolary.ts" />
-/// <reference path="AViews.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Default view container implementation.
-     */
-    var Views = (function (_super) {
-        __extends(Views, _super);
-        function Views(volary) {
-            _super.call(this);
-            this.initInstance("Views", Views.viewsInstanceIndex, volary);
-            Views.viewsInstanceIndex++;
-        }
-        Views.viewsInstanceIndex = 0;
-        return Views;
-    })(Volary.AViews);
-    Volary.Views = Views;
-})(Volary || (Volary = {}));
 /// <reference path="../instances/AInstance.ts" />
 var Volary;
 (function (Volary) {
     /**
-     * Abstract implementation of world.
+     * Abstract implementation of model.
      */
-    var AWorld = (function (_super) {
-        __extends(AWorld, _super);
-        function AWorld() {
+    var AModel = (function (_super) {
+        __extends(AModel, _super);
+        //        /**
+        //         * Retrieves parent collection, if this has been added one.
+        //         */
+        //        public getModelsOrNull() : IModels
+        //        {
+        //            return this.modelsOrNull;
+        //        }
+        //        /**
+        //         * Sets the parent collection, if added, or clears it, if removed.
+        //         */
+        //        public setModelsOrNull(caller : IModels) : void
+        //        {
+        //            this.modelsOrNull = caller;
+        //        }
+        function AModel() {
             _super.call(this);
         }
-        AWorld.prototype.initInstance = function (type, typeInstanceIndex) {
+        AModel.prototype.initInstance = function (type, typeInstanceIndex) {
             _super.prototype.initInstance.call(this, type, typeInstanceIndex);
         };
-        AWorld.prototype.addPoint = function (point) {
-            if ((this.x <= point.x && point.x < this.x + this.width)
-                && (this.y <= point.y && point.y < this.y + this.height)
-                && (this.z <= point.z && point.z < this.z + this.depth)) {
-                this.pointsInside[point.x - this.x][point.y - this.y].addPoint(this, point);
+        /**
+         * Call this before changing the model.
+         */
+        AModel.prototype.beginChanges = function () {
+            var changesId = 0;
+            //var modelsOrNull : IModels;
+            //            modelsOrNull = this.getModelsOrNull();
+            if (this.modelsOrNull) {
+                var volary;
+                var frameModifiedVolary;
+                //                volary = this.modelsOrNull.getVolary();
+                volary = this.modelsOrNull.volary;
+                //                frameModifiedVolary = volary.getCurrentFrame();
+                frameModifiedVolary = volary.currentFrame;
+                //this.setFrameModified(frameModifiedVolary);
+                this.frameModified = frameModifiedVolary;
+                this.modelsOrNull.notifyModelChangesBegin(this);
+                changesId = frameModifiedVolary;
             }
-            else {
-                this.pointsOutside.addPoint(this, point);
+            return changesId;
+        };
+        /**
+         * Call this to to end changes.
+         */
+        AModel.prototype.endChanges = function (changesId) {
+            //var modelsOrNull : IModels;
+            //modelsOrNull = this.getModelsOrNull();
+            if (this.modelsOrNull) {
+                this.modelsOrNull.notifyModelChangesEnd(this);
             }
         };
-        AWorld.prototype.removePoint = function (point) {
-            if ((this.x <= point.x && point.x < this.x + this.width)
-                && (this.y <= point.y && point.y < this.y + this.height)
-                && (this.z <= point.z && point.z < this.z + this.depth)) {
-                this.pointsInside[point.x - this.x][point.y - this.y].removePoint(this, point);
-            }
-            else {
-                this.pointsOutside.removePoint(this, point);
-            }
-        };
-        AWorld.prototype.addObserver = function (caller) {
-            for (var dy = 0; dy < this.height; ++dy) {
-                for (var dx = 0; dx < this.width; ++dx) {
-                    var pointsInside = this.pointsInside[dx][dy];
-                    var x = this.x + dx;
-                    var y = this.y + dy;
-                    if ((caller.x <= x && x < caller.x + caller.width)
-                        && (caller.y <= y && y < caller.y + caller.height)) {
-                        pointsInside.registerView(caller);
-                    }
-                }
-            }
-            this.viewsObserving.push(caller);
-        };
-        AWorld.prototype.hasObserver = function (caller) {
-            return (0 <= this.viewsObserving.indexOf(caller));
-        };
-        AWorld.prototype.removeObserver = function (caller) {
-            var index = this.viewsObserving.indexOf(caller);
-            for (var dy = 0; dy < this.height; ++dy) {
-                for (var dx = 0; dx < this.width; ++dx) {
-                    var pointsInside = this.pointsInside[dx][dy];
-                    var x = this.x + dx;
-                    var y = this.y + dy;
-                    if ((caller.x <= x && x < caller.x + caller.width)
-                        && (caller.y <= y && y < caller.y + caller.height)) {
-                        pointsInside.unregisterView(caller);
-                    }
-                }
-            }
-            this.viewsObserving.splice(index, 1);
-        };
-        return AWorld;
+        return AModel;
     })(Volary.AInstance);
-    Volary.AWorld = AWorld;
+    Volary.AModel = AModel;
+})(Volary || (Volary = {}));
+/// <reference path="../IInstance.ts" />
+/// <reference path="../AModel.ts" />
+/// <reference path="../../instances/positions/IPosition.ts" />
+/// <reference path="../../instances/colors/IColor.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Abstract implementation of pixel.
+     */
+    var APixel = (function (_super) {
+        __extends(APixel, _super);
+        function APixel() {
+            _super.call(this);
+        }
+        APixel.prototype.initInstance = function (type, typeInstanceIndex) {
+            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
+        };
+        return APixel;
+    })(Volary.AModel);
+    Volary.APixel = APixel;
+})(Volary || (Volary = {}));
+/// <reference path="../AInstance.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Abstract implementation of Position.
+     */
+    var APosition = (function (_super) {
+        __extends(APosition, _super);
+        function APosition() {
+            _super.call(this);
+        }
+        /**
+         * Retrieves X.
+         */
+        APosition.prototype.getX = function () {
+            return this.x;
+        };
+        /**
+         * Sets X.
+         */
+        APosition.prototype.setX = function (x) {
+            this.x = x;
+        };
+        /**
+         * Retrieves Y.
+         */
+        APosition.prototype.getY = function () {
+            return this.y;
+        };
+        /**
+         * Sets Y.
+         */
+        APosition.prototype.setY = function (y) {
+            this.y = y;
+        };
+        /**
+         * Retrieves Z.
+         */
+        APosition.prototype.getZ = function () {
+            return this.z;
+        };
+        /**
+         * Sets Z.
+         */
+        APosition.prototype.setZ = function (z) {
+            this.z = z;
+        };
+        APosition.prototype.initInstance = function (type, typeInstanceIndex) {
+            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
+        };
+        return APosition;
+    })(Volary.AInstance);
+    Volary.APosition = APosition;
 })(Volary || (Volary = {}));
 var Volary;
 (function (Volary) {
@@ -322,95 +289,96 @@ var Volary;
     })(Volary.APoints);
     Volary.Points = Points;
 })(Volary || (Volary = {}));
-/// <reference path="AWorld.ts" />
-/// <reference path="points/Points.ts" />
+/// <reference path="../AInstance.ts" />
 var Volary;
 (function (Volary) {
     /**
-     * Default world implementation.
+     * Abstract implementation of model.
      */
-    var World = (function (_super) {
-        __extends(World, _super);
-        function World(volary, worlds, x, y, z, width, height, depth) {
-            _super.call(this);
-            this.initInstance("World", World.worldInstanceIndex);
-            this.volary = volary;
-            this.worlds = worlds;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.width = width;
-            this.height = height;
-            this.depth = depth;
-            this.pointsOutside = new Volary.Points(volary, this, -1, -1);
-            this.pointsInside = new Array(); //[height];
-            for (var dx = 0; dx < width; ++dx) {
-                this.pointsInside.push(new Array());
-                for (var dy = 0; dy < height; ++dy) {
-                    this.pointsInside[dx].push(new Volary.Points(volary, this, dx, dy));
-                }
-            }
-            this.viewsObserving = new Array();
-            World.worldInstanceIndex++;
-        }
-        World.worldInstanceIndex = 0;
-        return World;
-    })(Volary.AWorld);
-    Volary.World = World;
-})(Volary || (Volary = {}));
-/// <reference path="../instances/AInstance.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract implementation of worlds.
-     */
-    var AWorlds = (function (_super) {
-        __extends(AWorlds, _super);
-        function AWorlds() {
+    var AColor = (function (_super) {
+        __extends(AColor, _super);
+        function AColor() {
             _super.call(this);
         }
-        AWorlds.prototype.initInstance = function (type, typeInstanceIndex) {
+        /**
+         * Retrieves the amount of red in channel [0;255].
+         */
+        AColor.prototype.getR = function () {
+            return this.r;
+        };
+        /**
+         * Sets the amount of red in channel [0;255].
+         */
+        AColor.prototype.setR = function (r) {
+            this.r = r;
+        };
+        /**
+         * Retrieves the amount of green in channel [0;255].
+         */
+        AColor.prototype.getG = function () {
+            return this.g;
+        };
+        /**
+         * Sets the amount of green in channel [0;255].
+         */
+        AColor.prototype.setG = function (g) {
+            this.g = g;
+        };
+        /**
+         * Retrieves the amount of blue in channel [0;255].
+         */
+        AColor.prototype.getB = function () {
+            return this.b;
+        };
+        /**
+         * Sets the amount of blue in channel [0;255].
+         */
+        AColor.prototype.setB = function (b) {
+            this.b = b;
+        };
+        /**
+         * Retrieves the amount of alpha in channel [0;255].
+         */
+        AColor.prototype.getA = function () {
+            return this.a;
+        };
+        /**
+         * Sets the amount of alpha in channel [0;255].
+         */
+        AColor.prototype.setA = function (a) {
+            this.a = a;
+        };
+        AColor.prototype.getRgbaString = function () {
+            return "rgba(" + this.getR() + ", " + this.getG() + ", " + this.getB() + ", " + (this.getA() / 255.0) + ")";
+        };
+        AColor.prototype.initInstance = function (type, typeInstanceIndex) {
             _super.prototype.initInstance.call(this, type, typeInstanceIndex);
         };
-        AWorlds.prototype.createWorld = function (x, y, z, width, height, depth) {
-            var world;
-            world = new Volary.World(this.volary, this, x, y, z, width, height, depth);
-            this.addWorld(world);
-            return world;
-        };
-        AWorlds.prototype.deleteWorld = function (world) {
-            this.removeWorld(world);
-        };
-        AWorlds.prototype.addWorld = function (world) {
-            this.worlds.push(world);
-        };
-        AWorlds.prototype.removeWorld = function (world) {
-            var index = this.worlds.indexOf(world);
-            this.worlds.splice(index, 1);
-        };
-        return AWorlds;
+        return AColor;
     })(Volary.AInstance);
-    Volary.AWorlds = AWorlds;
+    Volary.AColor = AColor;
 })(Volary || (Volary = {}));
-/// <reference path="AWorlds.ts" />
+/// <reference path="AColor.ts" />
 var Volary;
 (function (Volary) {
     /**
-     * Default worlds implementation.
+     * Default color implementation.
      */
-    var Worlds = (function (_super) {
-        __extends(Worlds, _super);
-        function Worlds(volary) {
+    var Color = (function (_super) {
+        __extends(Color, _super);
+        function Color() {
             _super.call(this);
-            this.initInstance("Worlds", Worlds.worldsInstanceIndex);
-            this.volary = volary;
-            this.worlds = new Array();
-            Worlds.worldsInstanceIndex++;
+            this.initInstance("Color", Color.modelInstanceIndex);
+            this.setR(0);
+            this.setG(0);
+            this.setB(0);
+            this.setA(0);
+            Color.modelInstanceIndex++;
         }
-        Worlds.worldsInstanceIndex = 0;
-        return Worlds;
-    })(Volary.AWorlds);
-    Volary.Worlds = Worlds;
+        Color.modelInstanceIndex = 0;
+        return Color;
+    })(Volary.AColor);
+    Volary.Color = Color;
 })(Volary || (Volary = {}));
 /// <reference path="../../instances/AInstance.ts" />
 var Volary;
@@ -556,280 +524,6 @@ var Volary;
         return Canvas;
     })(Volary.ACanvas);
     Volary.Canvas = Canvas;
-})(Volary || (Volary = {}));
-/// <reference path="../IInstance.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract model container implementation.
-     */
-    var AModels = (function (_super) {
-        __extends(AModels, _super);
-        function AModels() {
-            _super.call(this);
-            //        public getVolary() : IVolary
-            //        {
-            //            return this.volary;
-            //        }
-            //        protected setVolary(volary : IVolary) : void
-            //        {
-            //            this.volary = volary;
-            //        }
-            this.models = new Array();
-            this.modelObservers = new Array();
-        }
-        AModels.prototype.getModels = function () {
-            return this.models;
-        };
-        AModels.prototype.setModels = function (models) {
-            this.models = models;
-        };
-        AModels.prototype.getModelObservers = function () {
-            return this.modelObservers;
-        };
-        AModels.prototype.setModelObservers = function (modelObservers) {
-            this.modelObservers = modelObservers;
-        };
-        AModels.prototype.initInstance = function (type, typeInstanceIndex, volary) {
-            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
-            if (volary) {
-                //                this.setVolary(volary);
-                this.volary = volary;
-            }
-        };
-        AModels.prototype.getModelCount = function () {
-            return this.getModels().length;
-        };
-        AModels.prototype.getModelByIndex = function (index) {
-            var model = this.getModels()[index];
-            return model;
-        };
-        AModels.prototype.addModel = function (model) {
-            var modelObservers = this.getModelObservers();
-            var modelObserver;
-            var modelObserverIndex;
-            this.getModels().push(model);
-            //model.setModelsOrNull(this);
-            model.modelsOrNull = this;
-            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
-                modelObserver = modelObservers[modelObserverIndex];
-                modelObserver.startObservingModel(model);
-            }
-        };
-        AModels.prototype.removeModel = function (model) {
-            var modelObservers = this.getModelObservers();
-            var modelObserver;
-            var modelObserverIndex;
-            var models = this.getModels();
-            var index = models.indexOf(model);
-            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
-                modelObserver = modelObservers[modelObserverIndex];
-                modelObserver.stopObservingModel(model);
-            }
-            //model.setModelsOrNull(null);
-            model.modelsOrNull = null;
-            models.splice(index, 1);
-        };
-        AModels.prototype.addModelObserver = function (modelObserver) {
-            var models = this.getModels();
-            var model;
-            var modelIndex;
-            for (modelIndex = 0; modelIndex < models.length; ++modelIndex) {
-                model = models[modelIndex];
-                modelObserver.startObservingModel(model);
-            }
-            this.getModelObservers().push(modelObserver);
-        };
-        AModels.prototype.notifyModelChangesBegin = function (caller) {
-            var modelObservers = this.modelObservers; //this.getModelObservers();
-            var modelObserverIndex;
-            var modelObserver;
-            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
-                modelObserver = modelObservers[modelObserverIndex];
-                modelObserver.notifyObservedModelHide(caller);
-            }
-        };
-        AModels.prototype.notifyModelChangesEnd = function (caller) {
-            var modelObservers = this.modelObservers; //this.getModelObservers();
-            var modelObserverIndex;
-            var modelObserver;
-            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
-                modelObserver = modelObservers[modelObserverIndex];
-                modelObserver.notifyObservedModelShow(caller);
-            }
-        };
-        AModels.prototype.removeModelObserver = function (modelObserver) {
-            var modelObservers = this.getModelObservers();
-            var index = modelObservers.indexOf(modelObserver);
-            var models = this.getModels();
-            var model;
-            var modelIndex;
-            for (modelIndex = 0; modelIndex < models.length; ++modelIndex) {
-                model = models[modelIndex];
-                modelObserver.stopObservingModel(model);
-            }
-            modelObservers.splice(index, 1);
-        };
-        return AModels;
-    })(Volary.AInstance);
-    Volary.AModels = AModels;
-})(Volary || (Volary = {}));
-/// <reference path="../instances/AInstance.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract implementation of model.
-     */
-    var AModel = (function (_super) {
-        __extends(AModel, _super);
-        //        /**
-        //         * Retrieves parent collection, if this has been added one.
-        //         */
-        //        public getModelsOrNull() : IModels
-        //        {
-        //            return this.modelsOrNull;
-        //        }
-        //        /**
-        //         * Sets the parent collection, if added, or clears it, if removed.
-        //         */
-        //        public setModelsOrNull(caller : IModels) : void
-        //        {
-        //            this.modelsOrNull = caller;
-        //        }
-        function AModel() {
-            _super.call(this);
-        }
-        AModel.prototype.initInstance = function (type, typeInstanceIndex) {
-            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
-        };
-        /**
-         * Call this before changing the model.
-         */
-        AModel.prototype.beginChanges = function () {
-            var changesId = 0;
-            //var modelsOrNull : IModels;
-            //            modelsOrNull = this.getModelsOrNull();
-            if (this.modelsOrNull) {
-                var volary;
-                var frameModifiedVolary;
-                //                volary = this.modelsOrNull.getVolary();
-                volary = this.modelsOrNull.volary;
-                //                frameModifiedVolary = volary.getCurrentFrame();
-                frameModifiedVolary = volary.currentFrame;
-                //this.setFrameModified(frameModifiedVolary);
-                this.frameModified = frameModifiedVolary;
-                this.modelsOrNull.notifyModelChangesBegin(this);
-                changesId = frameModifiedVolary;
-            }
-            return changesId;
-        };
-        /**
-         * Call this to to end changes.
-         */
-        AModel.prototype.endChanges = function (changesId) {
-            //var modelsOrNull : IModels;
-            //modelsOrNull = this.getModelsOrNull();
-            if (this.modelsOrNull) {
-                this.modelsOrNull.notifyModelChangesEnd(this);
-            }
-        };
-        return AModel;
-    })(Volary.AInstance);
-    Volary.AModel = AModel;
-})(Volary || (Volary = {}));
-/// <reference path="../instances/colors/IColor.ts" />
-/// <reference path="../AInstance.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract implementation of model.
-     */
-    var AColor = (function (_super) {
-        __extends(AColor, _super);
-        function AColor() {
-            _super.call(this);
-        }
-        /**
-         * Retrieves the amount of red in channel [0;255].
-         */
-        AColor.prototype.getR = function () {
-            return this.r;
-        };
-        /**
-         * Sets the amount of red in channel [0;255].
-         */
-        AColor.prototype.setR = function (r) {
-            this.r = r;
-        };
-        /**
-         * Retrieves the amount of green in channel [0;255].
-         */
-        AColor.prototype.getG = function () {
-            return this.g;
-        };
-        /**
-         * Sets the amount of green in channel [0;255].
-         */
-        AColor.prototype.setG = function (g) {
-            this.g = g;
-        };
-        /**
-         * Retrieves the amount of blue in channel [0;255].
-         */
-        AColor.prototype.getB = function () {
-            return this.b;
-        };
-        /**
-         * Sets the amount of blue in channel [0;255].
-         */
-        AColor.prototype.setB = function (b) {
-            this.b = b;
-        };
-        /**
-         * Retrieves the amount of alpha in channel [0;255].
-         */
-        AColor.prototype.getA = function () {
-            return this.a;
-        };
-        /**
-         * Sets the amount of alpha in channel [0;255].
-         */
-        AColor.prototype.setA = function (a) {
-            this.a = a;
-        };
-        AColor.prototype.getRgbaString = function () {
-            return "rgba(" + this.getR() + ", " + this.getG() + ", " + this.getB() + ", " + (this.getA() / 255.0) + ")";
-        };
-        AColor.prototype.initInstance = function (type, typeInstanceIndex) {
-            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
-        };
-        return AColor;
-    })(Volary.AInstance);
-    Volary.AColor = AColor;
-})(Volary || (Volary = {}));
-/// <reference path="../../properties/ILocationProperty.ts" />
-/// <reference path="../../properties/IColorProperty.ts" />
-/// <reference path="AColor.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Default color implementation.
-     */
-    var Color = (function (_super) {
-        __extends(Color, _super);
-        function Color() {
-            _super.call(this);
-            this.initInstance("Color", Color.modelInstanceIndex);
-            this.setR(0);
-            this.setG(0);
-            this.setB(0);
-            this.setA(0);
-            Color.modelInstanceIndex++;
-        }
-        Color.modelInstanceIndex = 0;
-        return Color;
-    })(Volary.AColor);
-    Volary.Color = Color;
 })(Volary || (Volary = {}));
 /// <reference path="../instances/AInstance.ts" />
 /// <reference path="../instances/positions/IPosition.ts" />
@@ -1180,60 +874,6 @@ var Volary;
     })(Volary.AInstance);
     Volary.AView = AView;
 })(Volary || (Volary = {}));
-/// <reference path="../AInstance.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract implementation of Position.
-     */
-    var APosition = (function (_super) {
-        __extends(APosition, _super);
-        function APosition() {
-            _super.call(this);
-        }
-        /**
-         * Retrieves X.
-         */
-        APosition.prototype.getX = function () {
-            return this.x;
-        };
-        /**
-         * Sets X.
-         */
-        APosition.prototype.setX = function (x) {
-            this.x = x;
-        };
-        /**
-         * Retrieves Y.
-         */
-        APosition.prototype.getY = function () {
-            return this.y;
-        };
-        /**
-         * Sets Y.
-         */
-        APosition.prototype.setY = function (y) {
-            this.y = y;
-        };
-        /**
-         * Retrieves Z.
-         */
-        APosition.prototype.getZ = function () {
-            return this.z;
-        };
-        /**
-         * Sets Z.
-         */
-        APosition.prototype.setZ = function (z) {
-            this.z = z;
-        };
-        APosition.prototype.initInstance = function (type, typeInstanceIndex) {
-            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
-        };
-        return APosition;
-    })(Volary.AInstance);
-    Volary.APosition = APosition;
-})(Volary || (Volary = {}));
 /// <reference path="APosition.ts" />
 var Volary;
 (function (Volary) {
@@ -1254,6 +894,165 @@ var Volary;
         return Position;
     })(Volary.APosition);
     Volary.Position = Position;
+})(Volary || (Volary = {}));
+/// <reference path="AView.ts" />
+/// <reference path="../instances/positions/Position.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Default view implementation.
+     */
+    var View = (function (_super) {
+        __extends(View, _super);
+        function View() {
+            _super.call(this);
+            this.initInstance("View", View.viewInstanceIndex);
+            this.volaryOrNull = null;
+            this.viewsOrNull = null;
+            this.setCanvasOrNull(null);
+            //this.setLocation(new Position());
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+            this.a = 0;
+            //this.setExtent(new Position());
+            this.width = 0;
+            this.height = 0;
+            this.depth = 0;
+            this.pointsChanged = new Array();
+            this.pointsRemoved = new Array();
+            View.viewInstanceIndex++;
+        }
+        View.viewInstanceIndex = 0;
+        return View;
+    })(Volary.AView);
+    Volary.View = View;
+})(Volary || (Volary = {}));
+/// <reference path="../instances/positions/IPosition.ts" />
+/// <reference path="../instances/positions/IPosition.ts" />
+/// <reference path="../instances/IInstance.ts" />
+/// <reference path="../properties/ILocationProperty.ts" />
+/// <reference path="../properties/IExtentProperty.ts" />
+/// <reference path="../models/IModelObserver.ts" />
+/// <reference path="../IView.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Abstract model container implementation.
+     */
+    var AModels = (function (_super) {
+        __extends(AModels, _super);
+        function AModels() {
+            _super.call(this);
+            //        public getVolary() : IVolary
+            //        {
+            //            return this.volary;
+            //        }
+            //        protected setVolary(volary : IVolary) : void
+            //        {
+            //            this.volary = volary;
+            //        }
+            this.models = new Array();
+            this.modelObservers = new Array();
+        }
+        AModels.prototype.getModels = function () {
+            return this.models;
+        };
+        AModels.prototype.setModels = function (models) {
+            this.models = models;
+        };
+        AModels.prototype.getModelObservers = function () {
+            return this.modelObservers;
+        };
+        AModels.prototype.setModelObservers = function (modelObservers) {
+            this.modelObservers = modelObservers;
+        };
+        AModels.prototype.initInstance = function (type, typeInstanceIndex, volary) {
+            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
+            if (volary) {
+                //                this.setVolary(volary);
+                this.volary = volary;
+            }
+        };
+        AModels.prototype.getModelCount = function () {
+            return this.getModels().length;
+        };
+        AModels.prototype.getModelByIndex = function (index) {
+            var model = this.getModels()[index];
+            return model;
+        };
+        AModels.prototype.addModel = function (model) {
+            var modelObservers = this.getModelObservers();
+            var modelObserver;
+            var modelObserverIndex;
+            this.getModels().push(model);
+            //model.setModelsOrNull(this);
+            model.modelsOrNull = this;
+            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
+                modelObserver = modelObservers[modelObserverIndex];
+                modelObserver.startObservingModel(model);
+            }
+        };
+        AModels.prototype.removeModel = function (model) {
+            var modelObservers = this.getModelObservers();
+            var modelObserver;
+            var modelObserverIndex;
+            var models = this.getModels();
+            var index = models.indexOf(model);
+            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
+                modelObserver = modelObservers[modelObserverIndex];
+                modelObserver.stopObservingModel(model);
+            }
+            //model.setModelsOrNull(null);
+            model.modelsOrNull = null;
+            models.splice(index, 1);
+        };
+        AModels.prototype.addModelObserver = function (modelObserver) {
+            var models = this.getModels();
+            var model;
+            var modelIndex;
+            for (modelIndex = 0; modelIndex < models.length; ++modelIndex) {
+                model = models[modelIndex];
+                modelObserver.startObservingModel(model);
+            }
+            this.getModelObservers().push(modelObserver);
+        };
+        AModels.prototype.notifyModelChangesBegin = function (caller) {
+            var modelObservers = this.modelObservers; //this.getModelObservers();
+            var modelObserverIndex;
+            var modelObserver;
+            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
+                modelObserver = modelObservers[modelObserverIndex];
+                modelObserver.notifyObservedModelHide(caller);
+            }
+        };
+        AModels.prototype.notifyModelChangesEnd = function (caller) {
+            var modelObservers = this.modelObservers; //this.getModelObservers();
+            var modelObserverIndex;
+            var modelObserver;
+            for (modelObserverIndex = 0; modelObserverIndex < modelObservers.length; ++modelObserverIndex) {
+                modelObserver = modelObservers[modelObserverIndex];
+                modelObserver.notifyObservedModelShow(caller);
+            }
+        };
+        AModels.prototype.removeModelObserver = function (modelObserver) {
+            var modelObservers = this.getModelObservers();
+            var index = modelObservers.indexOf(modelObserver);
+            var models = this.getModels();
+            var model;
+            var modelIndex;
+            for (modelIndex = 0; modelIndex < models.length; ++modelIndex) {
+                model = models[modelIndex];
+                modelObserver.stopObservingModel(model);
+            }
+            modelObservers.splice(index, 1);
+        };
+        return AModels;
+    })(Volary.AInstance);
+    Volary.AModels = AModels;
 })(Volary || (Volary = {}));
 /// <reference path="../../instances/AInstance.ts" />
 var Volary;
@@ -1374,99 +1173,6 @@ var Volary;
     })(Volary.APoint);
     Volary.Point = Point;
 })(Volary || (Volary = {}));
-/// <reference path="AView.ts" />
-/// <reference path="../instances/positions/Position.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Default view implementation.
-     */
-    var View = (function (_super) {
-        __extends(View, _super);
-        function View() {
-            _super.call(this);
-            this.initInstance("View", View.viewInstanceIndex);
-            this.volaryOrNull = null;
-            this.viewsOrNull = null;
-            this.setCanvasOrNull(null);
-            //this.setLocation(new Position());
-            this.x = 0;
-            this.y = 0;
-            this.z = 0;
-            this.r = 0;
-            this.g = 0;
-            this.b = 0;
-            this.a = 0;
-            //this.setExtent(new Position());
-            this.width = 0;
-            this.height = 0;
-            this.depth = 0;
-            this.pointsChanged = new Array();
-            this.pointsRemoved = new Array();
-            View.viewInstanceIndex++;
-        }
-        View.viewInstanceIndex = 0;
-        return View;
-    })(Volary.AView);
-    Volary.View = View;
-})(Volary || (Volary = {}));
-/// <reference path="../AModel.ts" />
-/// <reference path="../../instances/positions/IPosition.ts" />
-/// <reference path="../../instances/colors/IColor.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Abstract implementation of pixel.
-     */
-    var APixel = (function (_super) {
-        __extends(APixel, _super);
-        function APixel() {
-            _super.call(this);
-        }
-        APixel.prototype.initInstance = function (type, typeInstanceIndex) {
-            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
-        };
-        return APixel;
-    })(Volary.AModel);
-    Volary.APixel = APixel;
-})(Volary || (Volary = {}));
-/// <reference path="APixel.ts" />
-/// <reference path="../../instances/positions/Position.ts" />
-/// <reference path="../../instances/colors/Color.ts" />
-var Volary;
-(function (Volary) {
-    /**
-     * Default pixel implementation.
-     */
-    var Pixel = (function (_super) {
-        __extends(Pixel, _super);
-        function Pixel() {
-            _super.call(this);
-            this.initInstance("Pixel", Pixel.pixelInstanceIndex);
-            //this.setLocation(new Position());
-            this.x = 0;
-            this.y = 0;
-            this.z = 0;
-            //this.setColor(new Color());
-            this.r = 0;
-            this.g = 0;
-            this.b = 0;
-            this.a = 0;
-            this.frameModified = 0;
-            this.modelsOrNull = null;
-            Pixel.pixelInstanceIndex++;
-        }
-        Pixel.pixelInstanceIndex = 0;
-        return Pixel;
-    })(Volary.APixel);
-    Volary.Pixel = Pixel;
-})(Volary || (Volary = {}));
-/// <reference path="../instances/positions/IPosition.ts" />
-/// <reference path="../instances/IInstance.ts" />
-/// <reference path="../properties/ILocationProperty.ts" />
-/// <reference path="../properties/IExtentProperty.ts" />
-/// <reference path="../models/IModelObserver.ts" />
-/// <reference path="../IView.ts" />
 /// <reference path="../IVolary.ts" />
 /// <reference path="AModels.ts" />
 var Volary;
@@ -1485,6 +1191,117 @@ var Volary;
         return Models;
     })(Volary.AModels);
     Volary.Models = Models;
+})(Volary || (Volary = {}));
+/// <reference path="../IVolary.ts" />
+/// <reference path="../instances/AInstance.ts" />
+/// <reference path="../models/IModels.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Abstract view container implementation.
+     */
+    var AViews = (function (_super) {
+        __extends(AViews, _super);
+        function AViews() {
+            _super.call(this);
+            this.views = new Array();
+            this.drawViewsCount = 0;
+        }
+        AViews.prototype.getVolary = function () {
+            return this.volary;
+        };
+        AViews.prototype.setVolary = function (volary) {
+            this.volary = volary;
+        };
+        AViews.prototype.getViews = function () {
+            return this.views;
+        };
+        AViews.prototype.setViews = function (views) {
+            this.views = views;
+        };
+        AViews.prototype.getDrawViewsCount = function () {
+            return this.drawViewsCount;
+        };
+        AViews.prototype.setDrawViewsCount = function (drawViewsCount) {
+            this.drawViewsCount = drawViewsCount;
+        };
+        AViews.prototype.initInstance = function (type, typeInstanceIndex, volary) {
+            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
+            if (volary) {
+                this.setVolary(volary);
+            }
+        };
+        AViews.prototype.getViewCount = function () {
+            return this.getViews().length;
+        };
+        AViews.prototype.getViewByIndex = function (index) {
+            var view = this.getViews()[index];
+            return view;
+        };
+        AViews.prototype.addView = function (view) {
+            var volary = this.getVolary();
+            this.getViews().push(view);
+            view.volaryOrNull = volary;
+            view.viewsOrNull = this;
+            //volary.getModels().addModelObserver(view);
+            //volary.worlds.
+        };
+        AViews.prototype.getViewByInstanceId = function (id) {
+            var viewOrNull = null;
+            for (var index = 0; index < this.views.length; ++index) {
+                var view = this.views[index];
+                if (view.getId().valueOf() == id.valueOf()) {
+                    viewOrNull = view;
+                    break;
+                }
+            }
+            return viewOrNull;
+        };
+        AViews.prototype.removeView = function (view) {
+            var volary = this.getVolary();
+            var views = this.getViews();
+            var index = views.indexOf(view);
+            //volary.getModels().removeModelObserver(view);
+            views.splice(index, 1);
+            view.viewsOrNull = null;
+            view.volaryOrNull = null;
+        };
+        AViews.prototype.drawViews = function () {
+            var views = this.getViews();
+            var index = 0;
+            var view;
+            var drawViewsCount = this.drawViewsCount; // this.getDrawViewsCount();
+            for (index = 0; index < views.length; ++index) {
+                view = views[index];
+                view.draw();
+            }
+            {
+                ++drawViewsCount;
+                this.drawViewsCount = drawViewsCount; //this.setDrawViewsCount(drawViewsCount);
+            }
+        };
+        return AViews;
+    })(Volary.AInstance);
+    Volary.AViews = AViews;
+})(Volary || (Volary = {}));
+/// <reference path="../IVolary.ts" />
+/// <reference path="AViews.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Default view container implementation.
+     */
+    var Views = (function (_super) {
+        __extends(Views, _super);
+        function Views(volary) {
+            _super.call(this);
+            this.initInstance("Views", Views.viewsInstanceIndex, volary);
+            Views.viewsInstanceIndex++;
+        }
+        Views.viewsInstanceIndex = 0;
+        return Views;
+    })(Volary.AViews);
+    Volary.Views = Views;
 })(Volary || (Volary = {}));
 /// <reference path="instances/AInstance.ts" />
 var Volary;
@@ -1556,6 +1373,71 @@ var Volary;
     })(Volary.AInstance);
     Volary.AVolary = AVolary;
 })(Volary || (Volary = {}));
+/// <reference path="../instances/AInstance.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Abstract implementation of worlds.
+     */
+    var AWorlds = (function (_super) {
+        __extends(AWorlds, _super);
+        function AWorlds() {
+            _super.call(this);
+        }
+        AWorlds.prototype.initInstance = function (type, typeInstanceIndex) {
+            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
+        };
+        AWorlds.prototype.createWorld = function (x, y, z, width, height, depth) {
+            var world;
+            world = new Volary.World(this.volary, this, x, y, z, width, height, depth);
+            this.addWorld(world);
+            return world;
+        };
+        AWorlds.prototype.getWorldByInstanceId = function (id) {
+            var worldOrNull = null;
+            for (var index = 0; index < this.worlds.length; ++index) {
+                var world = this.worlds[index];
+                if (world.getId().valueOf() == id.valueOf()) {
+                    worldOrNull = world;
+                    break;
+                }
+            }
+            return worldOrNull;
+        };
+        AWorlds.prototype.deleteWorld = function (world) {
+            this.removeWorld(world);
+        };
+        AWorlds.prototype.addWorld = function (world) {
+            this.worlds.push(world);
+        };
+        AWorlds.prototype.removeWorld = function (world) {
+            var index = this.worlds.indexOf(world);
+            this.worlds.splice(index, 1);
+        };
+        return AWorlds;
+    })(Volary.AInstance);
+    Volary.AWorlds = AWorlds;
+})(Volary || (Volary = {}));
+/// <reference path="AWorlds.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Default worlds implementation.
+     */
+    var Worlds = (function (_super) {
+        __extends(Worlds, _super);
+        function Worlds(volary) {
+            _super.call(this);
+            this.initInstance("Worlds", Worlds.worldsInstanceIndex);
+            this.volary = volary;
+            this.worlds = new Array();
+            Worlds.worldsInstanceIndex++;
+        }
+        Worlds.worldsInstanceIndex = 0;
+        return Worlds;
+    })(Volary.AWorlds);
+    Volary.Worlds = Worlds;
+})(Volary || (Volary = {}));
 /// <reference path="AVolary.ts" />
 /// <reference path="worlds/Worlds.ts" />
 var Volary;
@@ -1585,4 +1467,144 @@ var Volary;
         return Volary;
     })(Volary_1.AVolary);
     Volary_1.Volary = Volary;
+})(Volary || (Volary = {}));
+/// <reference path="../instances/colors/IColor.ts" />
+/// <reference path="../../properties/ILocationProperty.ts" />
+/// <reference path="../../properties/IColorProperty.ts" />
+/// <reference path="../instances/AInstance.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Abstract implementation of world.
+     */
+    var AWorld = (function (_super) {
+        __extends(AWorld, _super);
+        function AWorld() {
+            _super.call(this);
+        }
+        AWorld.prototype.initInstance = function (type, typeInstanceIndex) {
+            _super.prototype.initInstance.call(this, type, typeInstanceIndex);
+        };
+        AWorld.prototype.addPoint = function (point) {
+            if ((this.x <= point.x && point.x < this.x + this.width)
+                && (this.y <= point.y && point.y < this.y + this.height)
+                && (this.z <= point.z && point.z < this.z + this.depth)) {
+                this.pointsInside[point.x - this.x][point.y - this.y].addPoint(this, point);
+            }
+            else {
+                this.pointsOutside.addPoint(this, point);
+            }
+        };
+        AWorld.prototype.removePoint = function (point) {
+            if ((this.x <= point.x && point.x < this.x + this.width)
+                && (this.y <= point.y && point.y < this.y + this.height)
+                && (this.z <= point.z && point.z < this.z + this.depth)) {
+                this.pointsInside[point.x - this.x][point.y - this.y].removePoint(this, point);
+            }
+            else {
+                this.pointsOutside.removePoint(this, point);
+            }
+        };
+        AWorld.prototype.addObserver = function (caller) {
+            for (var dy = 0; dy < this.height; ++dy) {
+                for (var dx = 0; dx < this.width; ++dx) {
+                    var pointsInside = this.pointsInside[dx][dy];
+                    var x = this.x + dx;
+                    var y = this.y + dy;
+                    if ((caller.x <= x && x < caller.x + caller.width)
+                        && (caller.y <= y && y < caller.y + caller.height)) {
+                        pointsInside.registerView(caller);
+                    }
+                }
+            }
+            this.viewsObserving.push(caller);
+        };
+        AWorld.prototype.hasObserver = function (caller) {
+            return (0 <= this.viewsObserving.indexOf(caller));
+        };
+        AWorld.prototype.removeObserver = function (caller) {
+            var index = this.viewsObserving.indexOf(caller);
+            for (var dy = 0; dy < this.height; ++dy) {
+                for (var dx = 0; dx < this.width; ++dx) {
+                    var pointsInside = this.pointsInside[dx][dy];
+                    var x = this.x + dx;
+                    var y = this.y + dy;
+                    if ((caller.x <= x && x < caller.x + caller.width)
+                        && (caller.y <= y && y < caller.y + caller.height)) {
+                        pointsInside.unregisterView(caller);
+                    }
+                }
+            }
+            this.viewsObserving.splice(index, 1);
+        };
+        return AWorld;
+    })(Volary.AInstance);
+    Volary.AWorld = AWorld;
+})(Volary || (Volary = {}));
+/// <reference path="APixel.ts" />
+/// <reference path="../../instances/positions/Position.ts" />
+/// <reference path="../../instances/colors/Color.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Default pixel implementation.
+     */
+    var Pixel = (function (_super) {
+        __extends(Pixel, _super);
+        function Pixel() {
+            _super.call(this);
+            this.initInstance("Pixel", Pixel.pixelInstanceIndex);
+            //this.setLocation(new Position());
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            //this.setColor(new Color());
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+            this.a = 0;
+            this.frameModified = 0;
+            this.modelsOrNull = null;
+            Pixel.pixelInstanceIndex++;
+        }
+        Pixel.pixelInstanceIndex = 0;
+        return Pixel;
+    })(Volary.APixel);
+    Volary.Pixel = Pixel;
+})(Volary || (Volary = {}));
+/// <reference path="AWorld.ts" />
+/// <reference path="points/Points.ts" />
+var Volary;
+(function (Volary) {
+    /**
+     * Default world implementation.
+     */
+    var World = (function (_super) {
+        __extends(World, _super);
+        function World(volary, worlds, x, y, z, width, height, depth) {
+            _super.call(this);
+            this.initInstance("World", World.worldInstanceIndex);
+            this.volary = volary;
+            this.worlds = worlds;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.width = width;
+            this.height = height;
+            this.depth = depth;
+            this.pointsOutside = new Volary.Points(volary, this, -1, -1);
+            this.pointsInside = new Array(); //[height];
+            for (var dx = 0; dx < width; ++dx) {
+                this.pointsInside.push(new Array());
+                for (var dy = 0; dy < height; ++dy) {
+                    this.pointsInside[dx].push(new Volary.Points(volary, this, dx, dy));
+                }
+            }
+            this.viewsObserving = new Array();
+            World.worldInstanceIndex++;
+        }
+        World.worldInstanceIndex = 0;
+        return World;
+    })(Volary.AWorld);
+    Volary.World = World;
 })(Volary || (Volary = {}));
